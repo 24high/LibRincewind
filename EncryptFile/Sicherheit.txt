@@ -1,0 +1,6 @@
+Sicherheit:
+
+-Angreifbarkeit durch Quantencomputer von verschlüsseltem Text: Dürfte momentan ungefähr +/- 0 sein.
+-Angreifbarkeit durch Bruteforcing: +/- genauso wie Twofish
+-Angreifbarkeit durch Quantencomputer wenn ein Wörterbuch für die 1. Verschlüsselung genutzt wird: erst möglich, wenn es Quanten KI gibt.
+-Angreifbarkeit durch Bruteforcing wenn ein Wörterbruch für die 1. Verschlüsselung genutzt wird, anstatt Twofish: Wie bei Twofish, allerdings benötigt ein einzelner Versuch keinen Bruchteil von Sekunden mehr, sondern mehrere Sekunden (bei jeweils einer RTX 4090 zum knacken)
