@@ -107,7 +107,7 @@ namespace LibRincewind_4._7._2
           numArray3[index] = this.rotateByRight(numArray3[index], (int) numArray2[index]);
           ++num;
         }
-        while ((numArray3[index] < (byte) 32 || numArray3[index] > (byte) 126) && num < 255);
+        while ((numArray3[index] < (byte) 36 || numArray3[index] > (byte) 126) && num < 255);
         chArray[index] = (char) numArray3[index];
       }
       return new string(chArray);

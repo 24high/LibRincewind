@@ -26,57 +26,60 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
 {
   public class Blowfish : IPlugin
   {
-    public byte[] decrypt(byte[] data, string password, byte[] IV)
+        public byte[] decrypt(byte[] data, string password, byte[] IV)
         {
+
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(32);
+            byte[] key = pdb.GetBytes(64 / 8);
 
-            IBlockCipher symmetricBlockCipher = new ThreefishEngine(256);
-            IBlockCipherMode symmetricBlockMode = new KCtrBlockCipher(symmetricBlockCipher);
-            BufferedBlockCipher ctrCipher = new BufferedBlockCipher(symmetricBlockMode);
 
-            ParametersWithIV keyParamWithIV = new ParametersWithIV(new KeyParameter(key), IV);
-            ctrCipher.Init(false, keyParamWithIV);
+            List<byte> result = new List<byte>();
+            for (int i = 0; i < data.Length / 16; i++)
+            {
+                List<byte> ret = new List<byte>();
+                for (int z = i * 16; z < (i * 16) + 16; z++)
+                    ret.Add(data[z]);
+                TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Decrypting);
+                byte[] outputBuffer = new byte[data.Length];
+                rijndael.TransformBlock(data, 0, data.Length, outputBuffer, 0);
+                result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
+            }
+            return result.ToArray();
 
-            int blockSize = ctrCipher.GetBlockSize();
-            byte[] plainTextData = new byte[ctrCipher.GetOutputSize(data.Length)];
-            int processLength =
-            ctrCipher.ProcessBytes(data, 0, data.Length, plainTextData, 0);
-            int finalLength = ctrCipher.DoFinal(plainTextData, processLength);
-            byte[] finalPlainTextData = new byte[plainTextData.Length];
-            Array.Copy(plainTextData, 0, finalPlainTextData, 0, finalPlainTextData.Length);
-
-            return plainTextData;        
         }
 
-    public byte[] encrypt(byte[] data, string password, byte[] IV)
-    {
+        public byte[] encrypt(byte[] data, string password, byte[] IV)
+        {
+
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(32);
+            byte[] key = pdb.GetBytes(64 / 8);
 
-            IBlockCipher symmetricBlockCipher = new ThreefishEngine(256);            
-            IBlockCipherMode symmetricBlockMode = new KCtrBlockCipher(symmetricBlockCipher);
-            BufferedBlockCipher ctrCipher = new BufferedBlockCipher(symmetricBlockMode);
 
-            ParametersWithIV keyParamWithIV = new ParametersWithIV(new KeyParameter(key), IV);
-            ctrCipher.Init(true, keyParamWithIV);
-
-            int blockSize = ctrCipher.GetBlockSize();
-            byte[] cipherTextData = new byte[ctrCipher.GetOutputSize(data.Length)];
-            int processLength =
-            ctrCipher.ProcessBytes(data, 0, data.Length, cipherTextData, 0);
-            ctrCipher.DoFinal(cipherTextData, processLength);
-            return cipherTextData;
+            List<byte> result = new List<byte>();
+            for (int i = 0; i < data.Length / 16; i++)
+            {
+                List<byte> ret = new List<byte>();
+                for (int z = i * 16; z < (i * 16) + 16; z++)
+                    ret.Add(data[z]);
+                TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Encrypting);
+                byte[] outputBuffer = new byte[data.Length];
+                rijndael.TransformBlock(data, 0, data.Length, outputBuffer, 0);
+                result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
+            }
+            return result.ToArray();
         }
 
-    public byte[] generateIV(int length)
+        public byte[] generateIV(int length)
     {
       byte[] iv = new byte[length];
       for (int index = 0; index < length; index++)
       {
-        long ticks = DateTime.Now.Ticks;
-        iv[index] = (byte) new Random((int) ticks).Next(1, (int) byte.MaxValue);
-        System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(0,50));
+                do
+                {
+                    long ticks = DateTime.Now.Ticks;
+                    iv[index] = (byte)new Random((int)ticks).Next(1, (int)byte.MaxValue);
+                    System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(0, 50));
+                } while (iv[index] == 0);
       }
       return iv;
     }
