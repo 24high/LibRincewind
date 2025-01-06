@@ -21,6 +21,7 @@ using System.Text;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Crypto.Paddings;
+using System.Diagnostics;
 
 namespace LibRincewindPlugin_Blowfish_4._7._2
 {
@@ -40,8 +41,8 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
                 for (int z = i * 16; z < (i * 16) + 16; z++)
                     ret.Add(data[z]);
                 TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Decrypting);
-                byte[] outputBuffer = new byte[data.Length];
-                rijndael.TransformBlock(data, 0, data.Length, outputBuffer, 0);
+                byte[] outputBuffer = new byte[ret.ToArray().Length];
+                rijndael.TransformBlock(ret.ToArray(), 0, ret.ToArray().Length, outputBuffer, 0);
                 result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
             }
             return result.ToArray();
@@ -62,8 +63,8 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
                 for (int z = i * 16; z < (i * 16) + 16; z++)
                     ret.Add(data[z]);
                 TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Encrypting);
-                byte[] outputBuffer = new byte[data.Length];
-                rijndael.TransformBlock(data, 0, data.Length, outputBuffer, 0);
+                byte[] outputBuffer = new byte[ret.ToArray().Length];
+                rijndael.TransformBlock(ret.ToArray(), 0, ret.ToArray().Length, outputBuffer, 0);
                 result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
             }
             return result.ToArray();

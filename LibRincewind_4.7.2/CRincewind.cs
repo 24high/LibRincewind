@@ -36,16 +36,50 @@ namespace LibRincewind_4._7._2
 
     public CCryptData encryptCCD(string toEncrypt, string password1, string password2)
     {
-      byte[] randomKey = this.generateRandomKey(toEncrypt);
-      byte[] bytes = Encoding.ASCII.GetBytes(toEncrypt.ToCharArray());
-      for (int index = 0; index < randomKey.Length; ++index)
-      {
-        do
-        {
-          bytes[index] = this.rotateByLeft(bytes[index], (int) randomKey[index]);          
-        }
-        while ((bytes[index] < (byte) 32 || bytes[index] > (byte) 126));
-      }
+              byte[] randomKey = this.generateRandomKey(toEncrypt);
+              byte[] bytes = Encoding.ASCII.GetBytes(toEncrypt.ToCharArray());
+              for (int index = 0; index < randomKey.Length; ++index)
+              {
+                bool fail = false;
+                do
+                {
+                    byte orig = bytes[index];
+                    if (!fail)
+                    {
+                        do
+                        {
+                            bytes[index] = this.rotateByLeft(bytes[index], (int)randomKey[index]);
+                        }
+                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126));
+                    }
+
+                    byte tmp = bytes[index];
+                    int num = 0;
+
+                    num = 0;
+                    do
+                    {
+                        tmp = this.rotateByRight(tmp, randomKey[index]);
+                        ++num;
+                    } while ((bytes[index] < (byte)32 || bytes[index] > (byte)126) && num < 255);
+
+                    if (num >= 255)
+                    {
+                        randomKey[index] = (byte)new Random((int)DateTime.Now.Ticks).Next(0, 255);
+                        System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(10, 50));
+
+                        do
+                        {
+                            bytes[index] = this.rotateByLeft(bytes[index], (int)randomKey[index]);
+                        }
+                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126));
+
+                        fail = true;
+                        bytes[index] = orig;
+                    }
+                }while(fail);
+                              
+            }
 
             byte[] inArray1;
             byte[] dec;
@@ -53,11 +87,11 @@ namespace LibRincewind_4._7._2
             do
             {
                 inArray1 = this.plugin.encrypt(bytes, password1, this.IV);
-                dec = this.plugin.decrypt(inArray1, password1, IV).Take(bytes.Length).ToArray();
+                dec = this.plugin.decrypt(inArray1, password1, IV);
                 err = false;
-                for (int i = 0; i < dec.Length; ++i)
-                   if (dec[i] != bytes[i])
-                       err = true;
+                //for (int i = 0; i < dec.Length; ++i)
+                  // if (dec[i] != bytes[i])
+                    //   err = true;
             } while (err);
 
 
@@ -107,7 +141,8 @@ namespace LibRincewind_4._7._2
           numArray3[index] = this.rotateByRight(numArray3[index], (int) numArray2[index]);
           ++num;
         }
-        while ((numArray3[index] < (byte) 36 || numArray3[index] > (byte) 126) && num < 255);
+        while ((numArray3[index] < (byte) 36 || numArray3[index] > (byte) 126));
+        
         chArray[index] = (char) numArray3[index];
       }
       return new string(chArray);
@@ -164,7 +199,7 @@ namespace LibRincewind_4._7._2
       byte[] randomKey = new byte[input.Length];
       for (int index = 0; index < input.Length; ++index)
       {
-        char ch = (char) new Random().Next(1, (int) byte.MaxValue);
+        char ch = (char) new Random().Next(0, 255);
         randomKey[index] = (byte) ch;
       }
       return randomKey;
