@@ -31,21 +31,30 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(64 / 8);
+            byte[] key = pdb.GetBytes(256 / 8);
 
+            Twofish algorithm = new Twofish();
+            MemoryStream inCipherTextStream = new MemoryStream(data);
+            MemoryStream outPlainTextStream = new MemoryStream();
 
-            List<byte> result = new List<byte>();
-            for (int i = 0; i < data.Length / 16; i++)
+            var decryptor = algorithm.CreateDecryptor(key,IV);
+            var csRead = new CryptoStream(inCipherTextStream, decryptor, CryptoStreamMode.Read);
+            try
             {
-                List<byte> ret = new List<byte>();
-                for (int z = i * 16; z < (i * 16) + 16; z++)
-                    ret.Add(data[z]);
-                TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Decrypting);
-                byte[] outputBuffer = new byte[ret.ToArray().Length];
-                rijndael.TransformBlock(ret.ToArray(), 0, ret.ToArray().Length, outputBuffer, 0);
-                result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
+                csRead.CopyTo(outPlainTextStream);
             }
-            return result.ToArray();
+            catch
+            {
+                outPlainTextStream = inCipherTextStream;
+            }
+
+
+            // create an encoder
+
+            // we have to work backwards defining the last link in the chain first
+
+
+            return outPlainTextStream.ToArray();
 
         }
 
@@ -53,21 +62,19 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(64 / 8);
+            byte[] key = pdb.GetBytes(256 / 8);
 
+            Twofish algorithm = new Twofish();
+            System.IO.MemoryStream outCipherTextStream = new System.IO.MemoryStream();
 
-            List<byte> result = new List<byte>();
-            for (int i = 0; i < data.Length / 16; i++)
-            {
-                List<byte> ret = new List<byte>();
-                for (int z = i * 16; z < (i * 16) + 16; z++)
-                    ret.Add(data[z]);
-                TwofishEncryption rijndael = new TwofishEncryption(key.Length, ref key, ref IV, CipherMode.CBC, TwofishBase.EncryptionDirection.Encrypting);
-                byte[] outputBuffer = new byte[ret.ToArray().Length];
-                rijndael.TransformBlock(ret.ToArray(), 0, ret.ToArray().Length, outputBuffer, 0);
-                result.AddRange(rijndael.TransformFinalBlock(outputBuffer, 0, outputBuffer.Length));
-            }
-            return result.ToArray();
+            ICryptoTransform encode = new ToBase64Transform();
+
+            //create Twofish Encryptor from this instance
+
+            var encryptor = new Twofish().CreateEncryptor(key, IV);
+            var csWrite = new CryptoStream(outCipherTextStream, encryptor, CryptoStreamMode.Write);
+            new MemoryStream(data).CopyTo(csWrite);
+            return outCipherTextStream.ToArray();
         }
 
         public byte[] generateIV(int length)

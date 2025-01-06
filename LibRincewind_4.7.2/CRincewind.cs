@@ -43,6 +43,7 @@ namespace LibRincewind_4._7._2
                 bool fail = false;
                 do
                 {
+                    fail = false;
                     byte orig = bytes[index];
                     if (!fail)
                     {
@@ -50,7 +51,7 @@ namespace LibRincewind_4._7._2
                         {
                             bytes[index] = this.rotateByLeft(bytes[index], (int)randomKey[index]);
                         }
-                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126));
+                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126) && bytes[index]!=255 && bytes[index] != 0);
                     }
 
                     byte tmp = bytes[index];
@@ -61,18 +62,18 @@ namespace LibRincewind_4._7._2
                     {
                         tmp = this.rotateByRight(tmp, randomKey[index]);
                         ++num;
-                    } while ((bytes[index] < (byte)32 || bytes[index] > (byte)126) && num < 255);
+                    } while ((bytes[index] < (byte)32 || bytes[index] > (byte)126) && bytes[index] != 255 && bytes[index] != 0);
 
                     if (num >= 255)
                     {
-                        randomKey[index] = (byte)new Random((int)DateTime.Now.Ticks).Next(0, 255);
+                        randomKey[index] = (byte)new Random((int)DateTime.Now.Ticks).Next(1, 254);
                         System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(10, 50));
 
                         do
                         {
                             bytes[index] = this.rotateByLeft(bytes[index], (int)randomKey[index]);
                         }
-                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126));
+                        while ((bytes[index] < (byte)32 || bytes[index] > (byte)126) && bytes[index] != 255 && bytes[index] != 0);
 
                         fail = true;
                         bytes[index] = orig;
@@ -199,7 +200,7 @@ namespace LibRincewind_4._7._2
       byte[] randomKey = new byte[input.Length];
       for (int index = 0; index < input.Length; ++index)
       {
-        char ch = (char) new Random().Next(0, 255);
+        char ch = (char) new Random().Next(1, 254);
         randomKey[index] = (byte) ch;
       }
       return randomKey;
