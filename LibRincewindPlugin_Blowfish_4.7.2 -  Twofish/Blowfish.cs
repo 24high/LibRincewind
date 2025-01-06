@@ -10,11 +10,17 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 using LibRincewind_4._7._2;
 using ManyMonkeys.Cryptography;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Crypto.Paddings;
 
 namespace LibRincewindPlugin_Blowfish_4._7._2
 {
@@ -22,51 +28,45 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
   {
     public byte[] decrypt(byte[] data, string password, byte[] IV)
         {
-            Twofish algorithm = new Twofish();
-
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(256 / 8);
+            byte[] key = pdb.GetBytes(32);
 
-            MemoryStream inCipherTextStream = new MemoryStream(data);
-            MemoryStream outPlainTextStream = new MemoryStream();
+            IBlockCipher symmetricBlockCipher = new ThreefishEngine(256);
+            IBlockCipherMode symmetricBlockMode = new KCtrBlockCipher(symmetricBlockCipher);
+            BufferedBlockCipher ctrCipher = new BufferedBlockCipher(symmetricBlockMode);
 
-            var decryptor = algorithm.CreateDecryptor();
-            var csRead = new CryptoStream(inCipherTextStream, decryptor, CryptoStreamMode.Read);
-            try
-            {
-                csRead.CopyTo(outPlainTextStream);
-            }
-            catch 
-            {
-                outPlainTextStream = inCipherTextStream;    
-            }
-            
+            ParametersWithIV keyParamWithIV = new ParametersWithIV(new KeyParameter(key), IV);
+            ctrCipher.Init(false, keyParamWithIV);
 
-            // create an encoder
+            int blockSize = ctrCipher.GetBlockSize();
+            byte[] plainTextData = new byte[ctrCipher.GetOutputSize(data.Length)];
+            int processLength =
+            ctrCipher.ProcessBytes(data, 0, data.Length, plainTextData, 0);
+            int finalLength = ctrCipher.DoFinal(plainTextData, processLength);
+            byte[] finalPlainTextData = new byte[plainTextData.Length];
+            Array.Copy(plainTextData, 0, finalPlainTextData, 0, finalPlainTextData.Length);
 
-            // we have to work backwards defining the last link in the chain first
-
-
-            return outPlainTextStream.ToArray();
+            return plainTextData;        
         }
 
     public byte[] encrypt(byte[] data, string password, byte[] IV)
     {
-            Twofish algorithm = new Twofish();
-            System.IO.MemoryStream outCipherTextStream = new System.IO.MemoryStream();
-
-            // create an encoder
-
-            ICryptoTransform encode = new ToBase64Transform();
-
-            //create Twofish Encryptor from this instance
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(256/8);
+            byte[] key = pdb.GetBytes(32);
 
-            var encryptor = new Twofish().CreateEncryptor();
-            var csWrite = new CryptoStream(outCipherTextStream, encryptor, CryptoStreamMode.Write);
-            new MemoryStream(data).CopyTo(csWrite);
-            return outCipherTextStream.ToArray();
+            IBlockCipher symmetricBlockCipher = new ThreefishEngine(256);            
+            IBlockCipherMode symmetricBlockMode = new KCtrBlockCipher(symmetricBlockCipher);
+            BufferedBlockCipher ctrCipher = new BufferedBlockCipher(symmetricBlockMode);
+
+            ParametersWithIV keyParamWithIV = new ParametersWithIV(new KeyParameter(key), IV);
+            ctrCipher.Init(true, keyParamWithIV);
+
+            int blockSize = ctrCipher.GetBlockSize();
+            byte[] cipherTextData = new byte[ctrCipher.GetOutputSize(data.Length)];
+            int processLength =
+            ctrCipher.ProcessBytes(data, 0, data.Length, cipherTextData, 0);
+            ctrCipher.DoFinal(cipherTextData, processLength);
+            return cipherTextData;
         }
 
     public byte[] generateIV(int length)

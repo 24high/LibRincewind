@@ -42,9 +42,9 @@ namespace LibRincewind_4._7._2
       {
         do
         {
-          bytes[index] = this.rotateByLeft(bytes[index], (int) randomKey[index]);
+          bytes[index] = this.rotateByLeft(bytes[index], (int) randomKey[index]);          
         }
-        while (bytes[index] < (byte) 36 || bytes[index] > (byte) 126 );
+        while ((bytes[index] < (byte) 32 || bytes[index] > (byte) 126));
       }
 
             byte[] inArray1;
@@ -67,7 +67,7 @@ namespace LibRincewind_4._7._2
             do
             {
                 inArray2 = this.plugin.encrypt(randomKey, password2, this.IV);
-                dec1 = this.plugin.decrypt(inArray2, password2, IV).Take(randomKey.Length).ToArray();
+                //dec1 = this.plugin.decrypt(inArray2, password2, IV).Take(randomKey.Length).ToArray();
                 err = false;
                 //for (int i = 0; i < dec1.Length; ++i)
                   //  if (dec1[i] != randomKey[i])
@@ -107,7 +107,7 @@ namespace LibRincewind_4._7._2
           numArray3[index] = this.rotateByRight(numArray3[index], (int) numArray2[index]);
           ++num;
         }
-        while ((numArray3[index] < (byte) 36 || numArray3[index] > (byte) 126)&& numArray3[index]>0 );
+        while ((numArray3[index] < (byte) 32 || numArray3[index] > (byte) 126) && num < 255);
         chArray[index] = (char) numArray3[index];
       }
       return new string(chArray);
