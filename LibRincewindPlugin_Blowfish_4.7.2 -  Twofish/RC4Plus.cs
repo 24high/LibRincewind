@@ -10,36 +10,34 @@ public class CustomCSPRNG
 
     private readonly byte[] _key;
     private byte[] _state;
+    private readonly HMAC _hmac;
     private readonly RandomNumberGenerator _cryptoRng;
 
     public CustomCSPRNG(byte[] key)
     {
         if (key.Length < MinKeyLength) throw new ArgumentException($"Key must be at least {MinKeyLength} bytes long.");
-        _key = key;
+        _key = new byte[key.Length];
+        Array.Copy(key, _key, key.Length);
         _state = new byte[HashSize];
+        _hmac = new HMACSHA256(_key);
         _cryptoRng = RandomNumberGenerator.Create();
         InitializeState();
     }
 
     private void InitializeState()
     {
-        using (HMACSHA256 hmac = new HMACSHA256(_key))
-        {
-            hmac.ComputeHash(_key);
-            Array.Copy(hmac.Hash, _state, _state.Length);
-        }
+        byte[] initialState = _hmac.ComputeHash(_key);
+        Array.Copy(initialState, _state, _state.Length);
     }
 
     public byte[] GetBytes(int length)
     {
         byte[] randomBytes = new byte[length];
         int offset = 0;
-        HMACSHA256 hmac = new HMACSHA256(_state); // Reuse the HMACSHA256 instance
 
         while (offset < length)
         {
-            _state = hmac.ComputeHash(_state);
-
+            _state = _hmac.ComputeHash(_state);
             int bytesToCopy = Math.Min(length - offset, _state.Length);
             Array.Copy(_state, 0, randomBytes, offset, bytesToCopy);
             offset += bytesToCopy;
@@ -93,20 +91,26 @@ public class RC4Plus
     private const int BlockSize = 16;
 
     private readonly byte[] S;
-    private readonly byte[] key;
+    private readonly byte[] encryptionKey;
+    private readonly byte[] prngKey;
     private readonly CustomCSPRNG rng;
 
     public RC4Plus(byte[] key)
     {
-        this.key = key;
-        rng = new CustomCSPRNG(key);
+        // Split the key into two separate keys for encryption and PRNG
+        prngKey = new byte[key.Length / 2];
+        encryptionKey = new byte[key.Length / 2];
+        Array.Copy(key, 0, prngKey, 0, prngKey.Length);
+        Array.Copy(key, prngKey.Length, encryptionKey, 0, encryptionKey.Length);
+
+        rng = new CustomCSPRNG(prngKey);
         S = new byte[SBoxSize];
         Initialize();
     }
 
     private void Initialize()
     {
-        int keyLength = key.Length;
+        int keyLength = encryptionKey.Length;
 
         for (int i = 0; i < SBoxSize; i++)
         {
@@ -116,7 +120,7 @@ public class RC4Plus
         int j = 0;
         for (int i = 0; i < SBoxSize; i++)
         {
-            j = (j + S[i] + key[i % keyLength]) % SBoxSize;
+            j = (j + S[i] + encryptionKey[i % keyLength]) % SBoxSize;
             Swap(ref S[i], ref S[j]);
         }
 
@@ -135,6 +139,12 @@ public class RC4Plus
         for (int i = 0; i < SBoxSize; i++)
         {
             int j = (i + S[i]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
+        }
+
+        for (int i = 0; i < SBoxSize; i++)
+        {
+            int j = (j + S[i] + i) % SBoxSize;
             Swap(ref S[i], ref S[j]);
         }
     }
@@ -166,10 +176,14 @@ public class RC4Plus
 
         Array.Copy(iv, counter, iv.Length);
 
-        for (int i = 0; i < data.Length; i++)
+        for (int i = 0; i < data.Length; i += BlockSize)
         {
             encryptedCounter = EncryptDecrypt(counter);
-            result[i] = (byte)(data[i] ^ encryptedCounter[i % BlockSize]);
+
+            for (int j = 0; j < BlockSize && i + j < data.Length; j++)
+            {
+                result[i + j] = (byte)(data[i + j] ^ encryptedCounter[j]);
+            }
 
             IncrementCounter(counter);
         }
@@ -188,7 +202,7 @@ public class RC4Plus
     public static void Main()
     {
         string message = "Dies ist eine Nachricht, die verschlüsselt werden soll!";
-        byte[] key = Encoding.UTF8.GetBytes("MeinGeheimesPasswort");
+        byte[] key = Encoding.UTF8.GetBytes("MeinGeheimesPasswortMeinGeheimesPasswort"); // Key must be double length
 
         byte[] iv = new byte[16];
         CustomCSPRNG rng = new CustomCSPRNG(key);
