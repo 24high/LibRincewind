@@ -99,6 +99,7 @@
   <ItemGroup>
     <Compile Include="Blowfish.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ChaChar20.cs" />
     <Compile Include="RC4Plus.cs" />
     <Compile Include="Twofish.cs" />
     <Compile Include="TwofishBase.cs" />
