@@ -96,7 +96,7 @@ namespace LibRincewind_4._7._2
                     if(fail)
                     {
                         bytes[index] = orig;
-                        encryptedKey[index] = (byte) new Random((int)DateTime.Now.Ticks).Next(1, 254);
+                        encryptedKey[index] = (byte) new Random((int)DateTime.Now.Ticks).Next(1, 24);
                         fail = false;
                     }
                 } while (num >= 255);

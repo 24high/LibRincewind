@@ -31,9 +31,10 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(256 / 8);
+            byte[] key = pdb.GetBytes(128/8);
 
-            Twofish algorithm = new Twofish();
+            Aes algorithm = Aes.Create();
+            algorithm.BlockSize = 128;
             MemoryStream inCipherTextStream = new MemoryStream(data);
             MemoryStream outPlainTextStream = new MemoryStream();
 
@@ -62,9 +63,10 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(256 / 8);
+            byte[] key = pdb.GetBytes(128/8);
 
-            Twofish algorithm = new Twofish();
+            Aes algorithm = Aes.Create();
+            algorithm.BlockSize = 128;
             System.IO.MemoryStream outCipherTextStream = new System.IO.MemoryStream();
 
             ICryptoTransform encode = new ToBase64Transform();
