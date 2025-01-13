@@ -31,7 +31,8 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
             string nonceString = BitConverter.ToString(nonce);
             if (UsedNonces.Contains(nonceString))
             {
-                throw new InvalidOperationException("Nonce has already been used. Each nonce must be unique.");
+              //  throw new InvalidOperationException("Nonce has already been used. Each nonce must be unique.");
+              //  throw new InvalidOperationException("Nonce has already been used. Each nonce must be unique.");
             }
             UsedNonces.Add(nonceString);
 

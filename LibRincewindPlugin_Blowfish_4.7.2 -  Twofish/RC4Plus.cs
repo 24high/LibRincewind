@@ -1,219 +1,225 @@
-﻿    using System;
-    using System.Security.Cryptography;
-    using System.Text;
-    using NAudio.Wave;
+﻿using System;
+using System.Security.Cryptography;
+using Konscious.Security.Cryptography;
+using NAudio.Wave;
 
-    public class CustomCSPRNG
+public class RC4PlusImproved
+{
+    private const int SBoxSize = 256;
+    private const int BlockSize = 16;
+    private const int DropBytes = 3072;
+    private readonly byte[] S;
+    private readonly byte[] encryptionKey;
+    private readonly SecureCSPRNG rng;
+
+    public class SecureCSPRNG
     {
-        private const int HashSize = 32; // SHA-256 has a 32-byte output size
-        private const int MinKeyLength = 16;
+        private RandomNumberGenerator rng;
 
-        private readonly byte[] _key;
-        private byte[] _state;
-        private readonly HMAC _hmac;
-        private readonly RandomNumberGenerator _cryptoRng;
-
-        public CustomCSPRNG(byte[] key)
+        public SecureCSPRNG()
         {
-            if (key.Length < MinKeyLength) throw new ArgumentException($"Key must be at least {MinKeyLength} bytes long.");
-            _key = new byte[key.Length];
-            Array.Copy(key, _key, key.Length);
-            _state = new byte[HashSize];
-            _hmac = new HMACSHA256(_key);
-            _cryptoRng = RandomNumberGenerator.Create();
-            InitializeState();
-        }
-
-        private void InitializeState()
-        {
-            byte[] initialState = _hmac.ComputeHash(_key);
-            Array.Copy(initialState, _state, _state.Length);
+            rng = RandomNumberGenerator.Create();
         }
 
         public byte[] GetBytes(int length)
         {
-            byte[] randomBytes = new byte[length];
-            int offset = 0;
+            byte[] data = new byte[length];
+            rng.GetBytes(data);
 
-            while (offset < length)
+            // Weißes Rauschen von der Soundkarte hinzufügen
+            byte[] whiteNoise = GetWhiteNoiseFromSoundCard(length);
+            for (int i = 0; i < length; i++)
             {
-                _state = _hmac.ComputeHash(_state);
-                int bytesToCopy = Math.Min(length - offset, _state.Length);
-                Array.Copy(_state, 0, randomBytes, offset, bytesToCopy);
-                offset += bytesToCopy;
+                data[i] ^= whiteNoise[i];
             }
 
-            return randomBytes;
+            return data;
         }
 
-        public byte[] GetRandomBytesFromAudio(int length)
+        private byte[] GetWhiteNoiseFromSoundCard(int length)
         {
-            byte[] randomBytes = new byte[length];
-            byte[] audioBytes = new byte[length];
-            byte[] cryptoBytes = new byte[length];
+            byte[] buffer = new byte[length];
 
             using (var waveIn = new WaveInEvent())
             {
-                waveIn.DeviceNumber = 0;
                 waveIn.WaveFormat = new WaveFormat(44100, 16, 1);
-                waveIn.BufferMilliseconds = 50;
-
-                waveIn.DataAvailable += (sender, e) =>
+                waveIn.DataAvailable += (s, e) =>
                 {
-                    int bytesToCopy = Math.Min(length, e.BytesRecorded);
-                    Array.Copy(e.Buffer, 0, audioBytes, 0, bytesToCopy);
+                    Array.Copy(e.Buffer, buffer, length);
+                    waveIn.StopRecording();
                 };
-
                 waveIn.StartRecording();
-                System.Threading.Thread.Sleep(500);
-                waveIn.StopRecording();
+                System.Threading.Thread.Sleep(100); // Kurz warten, um genügend Daten zu erfassen
             }
 
-            _cryptoRng.GetBytes(cryptoBytes);
-
-            for (int i = 0; i < length; i++)
-            {
-                randomBytes[i] = (byte)(audioBytes[i] ^ cryptoBytes[i]);
-            }
-
-            return randomBytes;
-        }
-
-        public byte GetByte()
-        {
-            return GetRandomBytesFromAudio(1)[0];
+            return buffer;
         }
     }
 
-    public class RC4Plus
+    public RC4PlusImproved(byte[] key)
     {
-        private const int SBoxSize = 256;
-        private const int BlockSize = 16;
+        if (key.Length < 32)
+            throw new ArgumentException("Key must be at least 32 bytes long.");
 
-        private readonly byte[] S;
-        private readonly byte[] encryptionKey;
-        private readonly byte[] prngKey;
-        private readonly CustomCSPRNG rng;
-
-        public RC4Plus(byte[] key)
+        // Zufälliges Salt generieren
+        byte[] salt = new byte[16];
+        using (var rng = RandomNumberGenerator.Create())
         {
-            // Split the key into two separate keys for encryption and PRNG
-            prngKey = new byte[key.Length / 2];
-            encryptionKey = new byte[key.Length / 2];
-            Array.Copy(key, 0, prngKey, 0, prngKey.Length);
-            Array.Copy(key, prngKey.Length, encryptionKey, 0, encryptionKey.Length);
-
-            rng = new CustomCSPRNG(prngKey);
-            S = new byte[SBoxSize];
-            Initialize();
+            rng.GetBytes(salt);
         }
 
-        private void Initialize()
+        // Schlüssel derivieren
+        encryptionKey = DeriveKey(key, salt, 32);
+        this.rng = new SecureCSPRNG();
+
+        S = new byte[SBoxSize];
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        int keyLength = encryptionKey.Length;
+
+        // Initialisiere die S-Box mit kryptographisch sicheren Zufallszahlen
+        using (var rng = RandomNumberGenerator.Create())
         {
-            int keyLength = encryptionKey.Length;
-
-            for (int i = 0; i < SBoxSize; i++)
-            {
-                S[i] = (byte)i;
-            }
-
-            int j = 0;
-            for (int i = 0; i < SBoxSize; i++)
-            {
-                j = (j + S[i] + encryptionKey[i % keyLength]) % SBoxSize;
-                Swap(ref S[i], ref S[j]);
-            }
-
-            AdditionalMixing();
+            rng.GetBytes(S);
         }
 
-        private void Swap(ref byte a, ref byte b)
+        int j = 0;
+        for (int i = 0; i < SBoxSize; i++)
         {
-            byte temp = a;
-            a = b;
-            b = temp;
+            j = (j + S[i] + encryptionKey[i % keyLength]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
         }
 
-        private void AdditionalMixing()
+        // Key-Scheduling Drop-Bytes (zur Schwächung von Anfangskorrelationen)
+        for (int k = 0; k < DropBytes * 2; k++)
         {
-            for (int i = 0; i < SBoxSize; i++)
-            {
-                int j = (i + S[i]) % SBoxSize;
-                Swap(ref S[i], ref S[j]);
-            }
-
-            for (int i = 0; i < SBoxSize; i++)
-            {
-                int j = (j + S[i] + i) % SBoxSize;
-                Swap(ref S[i], ref S[j]);
-            }
+            int i = (k + 1) % SBoxSize;
+            j = (j + S[i]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
         }
 
-        public byte[] EncryptDecrypt(byte[] data)
+        // Zusätzliche Durchmischung der S-Box
+        AdditionalMixing();
+
+        // Stärkere Durchmischung durch zusätzlichen Entropieeinschluss
+        AdditionalRandomMixing();
+    }
+
+
+    private void Swap(ref byte a, ref byte b)
+    {
+        byte temp = a;
+        a = b;
+        b = temp;
+    }
+
+    private void AdditionalMixing()
+    {
+        int j = 0;
+        for (int i = 0; i < SBoxSize; i++)
         {
-            int i = 0;
-            int j = 0;
-            byte[] result = new byte[data.Length];
-
-            for (int k = 0; k < data.Length; k++)
-            {
-                i = (i + 1) % SBoxSize;
-                j = (j + S[i]) % SBoxSize;
-                Swap(ref S[i], ref S[j]);
-
-                byte K = S[(S[i] + S[j]) % SBoxSize];
-                result[k] = (byte)(data[k] ^ K);
-            }
-
-            return result;
+            j = (i + S[i]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
         }
-
-        public byte[] EncryptDecryptWithCTR(byte[] data, byte[] iv)
+        
+        for (int i = 0; i < SBoxSize; i++)
         {
-            byte[] result = new byte[data.Length];
-            byte[] counter = new byte[BlockSize];
-            byte[] encryptedCounter;
-
-            Array.Copy(iv, counter, iv.Length);
-
-            for (int i = 0; i < data.Length; i += BlockSize)
-            {
-                encryptedCounter = EncryptDecrypt(counter);
-
-                for (int j = 0; j < BlockSize && i + j < data.Length; j++)
-                {
-                    result[i + j] = (byte)(data[i + j] ^ encryptedCounter[j]);
-                }
-
-                IncrementCounter(counter);
-            }
-
-            return result;
-        }
-
-        private void IncrementCounter(byte[] counter)
-        {
-            for (int i = counter.Length - 1; i >= 0; i--)
-            {
-                if (++counter[i] != 0) break;
-            }
-        }
-
-        public static void Main()
-        {
-            string message = "Dies ist eine Nachricht, die verschlüsselt werden soll!";
-            byte[] key = Encoding.UTF8.GetBytes("MeinGeheimesPasswortMeinGeheimesPasswort"); // Key must be double length
-
-            byte[] iv = new byte[16];
-            CustomCSPRNG rng = new CustomCSPRNG(key);
-            iv = rng.GetRandomBytesFromAudio(16);
-
-            RC4Plus rc4Plus = new RC4Plus(key);
-
-            byte[] encrypted = rc4Plus.EncryptDecryptWithCTR(Encoding.UTF8.GetBytes(message), iv);
-            Console.WriteLine("Verschlüsselt: " + Convert.ToBase64String(encrypted));
-
-            byte[] decrypted = rc4Plus.EncryptDecryptWithCTR(encrypted, iv);
-            Console.WriteLine("Entschlüsselt: " + Encoding.UTF8.GetString(decrypted));
+            j = (j + S[i] + i) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
         }
     }
+
+    // Zusätzliche Mischung mit zufälliger Entropie
+    private void AdditionalRandomMixing()
+    {
+        byte[] randomBytes = rng.GetBytes(SBoxSize);
+        int j = 0;
+
+        for (int i = 0; i < SBoxSize; i++)
+        {
+            j = (j + S[i] + randomBytes[i]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
+        }
+    }
+
+public class Argon2idHasher
+{
+    private readonly byte[] password;
+    private readonly byte[] salt;
+    private readonly int degreeOfParallelism;
+    private readonly int memorySize;
+    private readonly int iterations;
+
+    public Argon2idHasher(byte[] password, byte[] salt, int degreeOfParallelism = 8, int memorySize = 65536, int iterations = 4)
+    {
+        this.password = password ?? throw new ArgumentNullException(nameof(password));
+        this.salt = salt ?? throw new ArgumentNullException(nameof(salt));
+        this.degreeOfParallelism = degreeOfParallelism;
+        this.memorySize = memorySize;
+        this.iterations = iterations;
+    }
+
+    public byte[] GetBytes(int keyLength)
+    {
+        using (var argon2 = new Argon2id(password))
+        {
+            argon2.Salt = salt;
+            argon2.DegreeOfParallelism = degreeOfParallelism;
+            argon2.MemorySize = memorySize;
+            argon2.Iterations = iterations;
+
+            return argon2.GetBytes(keyLength);
+        }
+    }
+}
+
+private static byte[] DeriveKey(byte[] password, byte[] salt, int keyLength)
+    {
+        if (salt == null || salt.Length == 0)
+        {
+            salt = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+        }
+
+        var argon2 = new  Argon2id(password)
+        {
+            Salt = salt,
+            DegreeOfParallelism = 8,
+            MemorySize = 65536, // Erhöhte Speicheranforderung
+            Iterations = 4
+        };
+
+        return argon2.GetBytes(keyLength);
+    }
+
+    public byte[] EncryptDecrypt(byte[] data)
+    {
+        int i = 0;
+        int j = 0;
+        byte[] result = new byte[data.Length];
+        for (int k = 0; k < data.Length; k++)
+        {
+            i = (i + 1) % SBoxSize;
+            j = (j + S[i]) % SBoxSize;
+            Swap(ref S[i], ref S[j]);
+            byte K = S[(S[i] + S[j]) % SBoxSize];
+            result[k] = (byte)(data[k] ^ K);
+        }
+        return result;
+    }
+
+    private void IncrementCounter(byte[] counter)
+    {
+        for (int i = counter.Length - 1; i >= 0; i--)
+        {
+            if (++counter[i] != 0)
+                break;
+        }
+    }
+}

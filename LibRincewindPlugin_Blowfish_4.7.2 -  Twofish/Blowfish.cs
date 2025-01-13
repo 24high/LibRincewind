@@ -31,31 +31,12 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(128/8);
+            byte[] key = pdb.GetBytes(256/8);
 
-            Aes algorithm = Aes.Create();
-            algorithm.BlockSize = 128;
-            MemoryStream inCipherTextStream = new MemoryStream(data);
-            MemoryStream outPlainTextStream = new MemoryStream();
-
-            var decryptor = algorithm.CreateDecryptor(key,IV);
-            var csRead = new CryptoStream(inCipherTextStream, decryptor, CryptoStreamMode.Read);
-            try
-            {
-                csRead.CopyTo(outPlainTextStream);
-            }
-            catch
-            {
-                outPlainTextStream = inCipherTextStream;
-            }
+            ChaCha20 chaCha20 = new ChaCha20(key, IV);
+            return chaCha20.EncryptDecrypt(data);
 
 
-            // create an encoder
-
-            // we have to work backwards defining the last link in the chain first
-
-
-            return outPlainTextStream.ToArray();
 
         }
 
@@ -63,20 +44,13 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(128/8);
+            byte[] key = pdb.GetBytes(256/8);
 
-            Aes algorithm = Aes.Create();
-            algorithm.BlockSize = 128;
-            System.IO.MemoryStream outCipherTextStream = new System.IO.MemoryStream();
+          
+            ChaCha20 chaCha20 = new ChaCha20(key, IV);
+            return chaCha20.EncryptDecrypt(data);
 
-            ICryptoTransform encode = new ToBase64Transform();
 
-            //create Twofish Encryptor from this instance
-
-            var encryptor = new Twofish().CreateEncryptor(key, IV);
-            var csWrite = new CryptoStream(outCipherTextStream, encryptor, CryptoStreamMode.Write);
-            new MemoryStream(data).CopyTo(csWrite);
-            return outCipherTextStream.ToArray();
         }
 
         public byte[] generateIV(int length)
