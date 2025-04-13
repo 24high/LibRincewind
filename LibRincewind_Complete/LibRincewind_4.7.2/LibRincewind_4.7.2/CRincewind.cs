@@ -30,7 +30,18 @@ namespace LibRincewind_4._7._2
       this.IV = this.plugin.generateIV(ivSize);
     }
 
-    public CCryptData encryptCCD(string toEncrypt, string password1, string password2)
+    public String encryptSkipLR(string toEncrypt, string password1, string password2, byte[] seed, byte[] seed1)
+    {
+        byte[] bytes = Encoding.ASCII.GetBytes(toEncrypt.ToCharArray());
+        return Encoding.ASCII.GetString(this.plugin.encrypt(bytes, password1, this.IV, seed, seed1));
+    }
+
+    public String decryptSkipLR(string toDecrypt, string password1, string password2, byte[] seed, byte[] seed1)
+    {
+        return Encoding.ASCII.GetString(this.plugin.decrypt(Encoding.ASCII.GetBytes(toDecrypt), password1, this.IV, seed,seed1));
+    }
+
+        public CCryptData encryptCCD(string toEncrypt, string password1, string password2)
     {
       byte[] randomKey = this.generateRandomKey(toEncrypt);
             byte[] seed = this.plugin.generateIV(256);
@@ -65,7 +76,7 @@ namespace LibRincewind_4._7._2
       return Convert.ToBase64String(serializationStream.GetBuffer());
     }
 
-    public string decryptCCD(CCryptData cryptData, string password1, string password2)
+    public string decryptCCD(CCryptData cryptData, string password1, string password2, bool skipRW=false)
     {
       byte[] data1 = Convert.FromBase64String(cryptData.CryptedData);
       byte[] data2 = Convert.FromBase64String(cryptData.Key);
@@ -86,6 +97,8 @@ namespace LibRincewind_4._7._2
       }
       return new string(chArray);
     }
+
+
         
     public string decryptString(string cryptDataB64, string password1, string password2)
     {
