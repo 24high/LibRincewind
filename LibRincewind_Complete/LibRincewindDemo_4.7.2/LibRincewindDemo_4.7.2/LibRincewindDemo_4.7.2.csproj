@@ -64,6 +64,10 @@
       <Project>{14f0e7b0-c856-4b8f-a1b7-511a23070460}</Project>
       <Name>LibRincewindPlugin_Blowfish_4.7.2</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindPlugin_ChaCha20_4.7.2\LibRincewindPlugin_ChaCha20_4.7.2.csproj">
+      <Project>{ff984ee1-6d6d-4466-a6d1-1a7169f2b6b3}</Project>
+      <Name>LibRincewindPlugin_ChaCha20_4.7.2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\LibRincewindPlugin_RC4Plus_4.7.2\LibRincewindPlugin_RC4Plus_4.7.2.csproj">
       <Project>{5a34cf29-9931-4760-8ef2-78db2038f0ef}</Project>
       <Name>LibRincewindPlugin_RC4Plus_4.7.2</Name>
@@ -72,6 +76,9 @@
       <Project>{7ad2c1b4-0821-4fd7-a004-e391f2056101}</Project>
       <Name>LibRincewind_4.7.2</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

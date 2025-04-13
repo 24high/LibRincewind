@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35919.96 d17.13
+VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewind_4.7.2", "LibRincewind_4.7.2\LibRincewind_4.7.2\LibRincewind_4.7.2.csproj", "{7AD2C1B4-0821-4FD7-A004-E391F2056101}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_Blowfish_4.7.2", "LibRincewindPlugin_Blowfish_4.7.2\LibRincewindPlugin_Blowfish_4.7.2.csproj", "{14F0E7B0-C856-4B8F-A1B7-511A23070460}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_RC4Plus_4.7.2", "LibRincewindPlugin_RC4Plus_4.7.2\LibRincewindPlugin_RC4Plus_4.7.2.csproj", "{5A34CF29-9931-4760-8EF2-78DB2038F0EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_ChaCha20_4.7.2", "LibRincewindPlugin_ChaCha20_4.7.2\LibRincewindPlugin_ChaCha20_4.7.2.csproj", "{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

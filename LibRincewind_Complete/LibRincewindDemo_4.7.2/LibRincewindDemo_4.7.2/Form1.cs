@@ -30,13 +30,10 @@ namespace LibRincewindDemo_4._7._2
     private TextBox textBox3;
     private TextBox textBox4;
     private TextBox textBox5;
-        private TextBox textBox7;
-        private Label label7;
         private TextBox textBox6;
         private GroupBox groupBox1;
         private RadioButton radioButton1;
         private RadioButton radioButton4;
-        private RadioButton radioButton3;
         private RadioButton radioButton2;
         bool useRC4 = false;
     public Form1()
@@ -101,13 +98,10 @@ namespace LibRincewindDemo_4._7._2
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,6 +131,7 @@ namespace LibRincewindDemo_4._7._2
             this.label3.Size = new System.Drawing.Size(175, 25);
             this.label3.TabIndex = 2;
             this.label3.Text = "String to encrypt:";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // button1
             // 
@@ -230,27 +225,9 @@ namespace LibRincewindDemo_4._7._2
             this.textBox6.Size = new System.Drawing.Size(400, 31);
             this.textBox6.TabIndex = 13;
             // 
-            // textBox7
-            // 
-            this.textBox7.Location = new System.Drawing.Point(219, 333);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(400, 31);
-            this.textBox7.TabIndex = 15;
-            this.textBox7.UseSystemPasswordChar = true;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(24, 331);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(130, 25);
-            this.label7.TabIndex = 14;
-            this.label7.Text = "Password 2:";
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.radioButton4);
-            this.groupBox1.Controls.Add(this.radioButton3);
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
@@ -260,10 +237,33 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Algorithm";
             // 
+            // radioButton4
+            // 
+            this.radioButton4.AutoSize = true;
+            this.radioButton4.Location = new System.Drawing.Point(225, 139);
+            this.radioButton4.Name = "radioButton4";
+            this.radioButton4.Size = new System.Drawing.Size(145, 29);
+            this.radioButton4.TabIndex = 3;
+            this.radioButton4.Text = "ChaCha20";
+            this.radioButton4.UseVisualStyleBackColor = true;
+            this.radioButton4.CheckedChanged += new System.EventHandler(this.radioButton4_CheckedChanged);
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(225, 104);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(127, 29);
+            this.radioButton2.TabIndex = 1;
+            this.radioButton2.Text = "RC4Plus";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
+            // 
             // radioButton1
             // 
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(51, 53);
+            this.radioButton1.Checked = true;
+            this.radioButton1.Location = new System.Drawing.Point(225, 69);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(123, 29);
             this.radioButton1.TabIndex = 0;
@@ -272,40 +272,6 @@ namespace LibRincewindDemo_4._7._2
             this.radioButton1.UseVisualStyleBackColor = true;
             this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(51, 136);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(127, 29);
-            this.radioButton2.TabIndex = 1;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "RC4Plus";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
-            // 
-            // radioButton3
-            // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(336, 53);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(117, 29);
-            this.radioButton3.TabIndex = 2;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Twofish";
-            this.radioButton3.UseVisualStyleBackColor = true;
-            // 
-            // radioButton4
-            // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(336, 136);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(145, 29);
-            this.radioButton4.TabIndex = 3;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "ChaCha20";
-            this.radioButton4.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -313,8 +279,6 @@ namespace LibRincewindDemo_4._7._2
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(640, 673);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.textBox7);
-            this.Controls.Add(this.label7);
             this.Controls.Add(this.textBox6);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.textBox4);
@@ -352,6 +316,18 @@ namespace LibRincewindDemo_4._7._2
         {
             if(radioButton2.Checked)
                 this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll", 16);
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            if(radioButton4.Checked)
+                this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_ChaCha20_4.7.2.dll", 96/8);
 
         }
     }
