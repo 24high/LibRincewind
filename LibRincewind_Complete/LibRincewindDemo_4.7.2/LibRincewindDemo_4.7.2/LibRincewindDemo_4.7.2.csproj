@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--Project was exported from assembly: C:\Users\denni\Downloads\LibRincewind-main\LibRincewind-main\Demo\LibRincewindDemo_4.7.2.exe-->
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{053E737A-1F58-49C5-893B-F253AE9D5B53}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>LibRincewindDemo_4.7.2</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <FileAlignment>512</FileAlignment>
+    <RootNamespace>LibRincewindDemo_4._7._2</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Drawing.Common.9.0.4\lib\net462\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\Resources.cs" />
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form1.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\LibRincewindPlugin_4.7.2\LibRincewindPlugin_4.7.2.csproj">
+      <Project>{0887b565-cab4-4048-87f4-c67471ec438a}</Project>
+      <Name>LibRincewindPlugin_4.7.2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindPlugin_Blowfish_4.7.2\LibRincewindPlugin_Blowfish_4.7.2.csproj">
+      <Project>{14f0e7b0-c856-4b8f-a1b7-511a23070460}</Project>
+      <Name>LibRincewindPlugin_Blowfish_4.7.2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindPlugin_RC4Plus_4.7.2\LibRincewindPlugin_RC4Plus_4.7.2.csproj">
+      <Project>{5a34cf29-9931-4760-8ef2-78db2038f0ef}</Project>
+      <Name>LibRincewindPlugin_RC4Plus_4.7.2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewind_4.7.2\LibRincewind_4.7.2\LibRincewind_4.7.2.csproj">
+      <Project>{7ad2c1b4-0821-4fd7-a004-e391f2056101}</Project>
+      <Name>LibRincewind_4.7.2</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

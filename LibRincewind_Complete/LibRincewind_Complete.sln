@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewind_4.7.2", "LibRincewind_4.7.2\LibRincewind_4.7.2\LibRincewind_4.7.2.csproj", "{7AD2C1B4-0821-4FD7-A004-E391F2056101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindDemo_4.7.2", "LibRincewindDemo_4.7.2\LibRincewindDemo_4.7.2\LibRincewindDemo_4.7.2.csproj", "{053E737A-1F58-49C5-893B-F253AE9D5B53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_4.7.2", "LibRincewindPlugin_4.7.2\LibRincewindPlugin_4.7.2.csproj", "{0887B565-CAB4-4048-87F4-C67471EC438A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_Blowfish_4.7.2", "LibRincewindPlugin_Blowfish_4.7.2\LibRincewindPlugin_Blowfish_4.7.2.csproj", "{14F0E7B0-C856-4B8F-A1B7-511A23070460}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_RC4Plus_4.7.2", "LibRincewindPlugin_RC4Plus_4.7.2\LibRincewindPlugin_RC4Plus_4.7.2.csproj", "{5A34CF29-9931-4760-8EF2-78DB2038F0EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AD2C1B4-0821-4FD7-A004-E391F2056101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD2C1B4-0821-4FD7-A004-E391F2056101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD2C1B4-0821-4FD7-A004-E391F2056101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD2C1B4-0821-4FD7-A004-E391F2056101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{053E737A-1F58-49C5-893B-F253AE9D5B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{053E737A-1F58-49C5-893B-F253AE9D5B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{053E737A-1F58-49C5-893B-F253AE9D5B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{053E737A-1F58-49C5-893B-F253AE9D5B53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0887B565-CAB4-4048-87F4-C67471EC438A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0887B565-CAB4-4048-87F4-C67471EC438A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0887B565-CAB4-4048-87F4-C67471EC438A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0887B565-CAB4-4048-87F4-C67471EC438A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14F0E7B0-C856-4B8F-A1B7-511A23070460}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14F0E7B0-C856-4B8F-A1B7-511A23070460}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14F0E7B0-C856-4B8F-A1B7-511A23070460}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14F0E7B0-C856-4B8F-A1B7-511A23070460}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A34CF29-9931-4760-8EF2-78DB2038F0EF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D03F80C-34EF-4D1B-92DD-93CAF0EA9D9E}
+	EndGlobalSection
+EndGlobal
