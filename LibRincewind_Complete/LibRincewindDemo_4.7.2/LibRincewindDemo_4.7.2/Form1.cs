@@ -464,16 +464,18 @@ namespace LibRincewindDemo_4._7._2
                         cryptData.IV = this.libRincewind.IV;
                         cryptData.Salt = Convert.ToBase64String(generateIV(256));
                         cryptData.Salt1 = Convert.ToBase64String(generateIV(256));
+                        String LRDec = libRincewind.decryptCCD(cryptData, pass1, pass2);
                         this.textBox8.Invoke(new Action(() =>
                         {
 
-                            this.textBox8.Text = libRincewind.decryptCCD(cryptData, pass1, pass2);
+                            this.textBox8.Text = LRDec;
                         }));
+                        String enc = libRincewind.encryptSkipLR(textBox3.Text, textBox1.Text, textBox2.Text, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
+                        String dec = libRincewind.decryptSkipLR(enc, pass1, pass2, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
 
                         this.textBox7.Invoke(new Action(() =>
                         {
-                            String enc = libRincewind.encryptSkipLR(textBox3.Text, textBox1.Text, textBox2.Text, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
-                            this.textBox7.Text = libRincewind.decryptSkipLR(enc, pass1, pass2, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
+                            this.textBox7.Text = dec;
                         }));
                         System.Threading.Thread.Sleep(500);
                     }
