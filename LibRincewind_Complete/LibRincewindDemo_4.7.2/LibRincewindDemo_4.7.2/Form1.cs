@@ -43,6 +43,7 @@ namespace LibRincewindDemo_4._7._2
         private TextBox textBox8;
         private GroupBox groupBox2;
         private GroupBox groupBox3;
+        private Label label9;
         bool useRC4 = false;
     public Form1()
     {
@@ -61,11 +62,12 @@ namespace LibRincewindDemo_4._7._2
         byte[] salt1 = null;
         private void button1_Click(object sender, EventArgs e)
     {
-      CCryptData ccryptData = this.libRincewind.encryptCCD(this.textBox3.Text, this.textBox1.Text, this.textBox2.Text);
+            salt = generateIV(256);
+
+            salt1 = generateIV(256);
+            CCryptData ccryptData = this.libRincewind.encryptCCD(this.textBox3.Text, this.textBox1.Text, this.textBox2.Text,salt,salt1);
       this.textBox4.Text = ccryptData.CryptedData;
       this.textBox5.Text = ccryptData.Key;
-            salt = Convert.FromBase64String(ccryptData.Salt);
-            salt1 = Convert.FromBase64String(ccryptData.Salt1);
         }
 
     private void button2_Click(object sender, EventArgs e)
@@ -75,12 +77,11 @@ namespace LibRincewindDemo_4._7._2
       cryptData.CryptedData = this.textBox4.Text;
       cryptData.Key = this.textBox5.Text;
       cryptData.IV = this.libRincewind.IV;
-            cryptData.Salt = Convert.ToBase64String(salt);
-            cryptData.Salt1 = Convert.ToBase64String(salt1);
+        
 
             string text1 = this.textBox1.Text;
       string text2 = this.textBox2.Text;
-      this.textBox6.Text = libRincewind.decryptCCD(cryptData, text1, text2);
+      this.textBox6.Text = libRincewind.decryptCCD(cryptData, text1, text2, salt, salt1);
     }
 
     protected override void Dispose(bool disposing)
@@ -117,6 +118,7 @@ namespace LibRincewindDemo_4._7._2
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -356,6 +358,7 @@ namespace LibRincewindDemo_4._7._2
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label9);
             this.groupBox3.Controls.Add(this.textBox8);
             this.groupBox3.Controls.Add(this.textBox7);
             this.groupBox3.Controls.Add(this.label8);
@@ -368,6 +371,15 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Test failures";
             this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(367, 215);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(70, 25);
+            this.label9.TabIndex = 22;
+            this.label9.Text = "label9";
             // 
             // Form1
             // 
@@ -451,6 +463,8 @@ namespace LibRincewindDemo_4._7._2
                 button3.Text = "Stop";
                 new System.Threading.Thread(() =>
                 {
+                    long tries = 0;
+                    long errors = 0;
                     running = true;
                     while (running)
                     {
@@ -464,19 +478,21 @@ namespace LibRincewindDemo_4._7._2
                         cryptData.IV = this.libRincewind.IV;
                         cryptData.Salt = Convert.ToBase64String(generateIV(256));
                         cryptData.Salt1 = Convert.ToBase64String(generateIV(256));
-                        String LRDec = libRincewind.decryptCCD(cryptData, pass1, pass2);
+                        String LRDec = libRincewind.decryptCCD(cryptData, pass1, pass2, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
                         this.textBox8.Invoke(new Action(() =>
                         {
-
+                            tries++;
+                            for (int i = 0; i < LRDec.Length; i++)
+                                if (LRDec[i] < 36 || LRDec[i] > 126)
+                                {
+                                    errors++;
+                                    break;
+                                }
+                            this.label9.Text=errors.ToString()+"/"+tries.ToString();
                             this.textBox8.Text = LRDec;
                         }));
-                        String enc = libRincewind.encryptSkipLR(textBox3.Text, textBox1.Text, textBox2.Text, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
-                        String dec = libRincewind.decryptSkipLR(enc, pass1, pass2, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
-
-                        this.textBox7.Invoke(new Action(() =>
-                        {
-                            this.textBox7.Text = dec;
-                        }));
+                       
+                       
                         System.Threading.Thread.Sleep(500);
                     }
                     ;

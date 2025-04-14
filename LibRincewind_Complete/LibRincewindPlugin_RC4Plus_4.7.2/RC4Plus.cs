@@ -24,16 +24,7 @@ public class RC4PlusImproved
         if (key.Length < 32)
             throw new ArgumentException("Key must be at least 32 bytes long.");
 
-        // Falls kein Salt übergeben wird, generiere ein neues.
-        if (salt == null || salt.Length == 0)
-        {
-            salt = new byte[16];
-            using (var rnd = RandomNumberGenerator.Create())
-            {
-                rnd.GetBytes(salt);
-            }
-        }
-
+        
         // Ableitung des Schlüssels mit Argon2id
         encryptionKey = DeriveKey(key, salt, 32);
         rng = new SecureCSPRNG();
