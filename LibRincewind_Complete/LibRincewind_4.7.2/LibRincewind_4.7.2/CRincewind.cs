@@ -53,7 +53,7 @@ namespace LibRincewind_4._7._2
         {
           bytes[index] = this.rotateByLeft(bytes[index], (int) randomKey[index]);
         }
-        while (bytes[index] < (byte) 36 || bytes[index] > (byte) 126);
+        while ((bytes[index] < (byte) 36 || bytes[index] > (byte) 126)&& bytes[index]!=0);
       }
       byte[] inArray1 = this.plugin.encrypt(bytes, password1, this.IV,seed,seed1);
       byte[] inArray2 = this.plugin.encrypt(randomKey, password2, this.IV,seed,seed1);
@@ -110,7 +110,8 @@ namespace LibRincewind_4._7._2
       byte[] randomKey = new byte[input.Length];
       for (int index = 0; index < input.Length; ++index)
       {
-        char ch = (char) new Random().Next(1, (int) byte.MaxValue);
+        char ch = (char) new Random().Next(1, (int) byte.MaxValue-1);
+                System.Threading.Thread.Sleep(new Random().Next(100, 300));
         randomKey[index] = (byte) ch;
       }
       return randomKey;
@@ -120,13 +121,19 @@ namespace LibRincewind_4._7._2
     {
       delta %= 6;
       ++delta;
+      
       byte num1 = input;
-      for (int index = 0; index < delta; ++index)
-      {
-        byte num2 = (byte) ((uint) (byte) ((uint) num1 & 64U) >> 6);
-        num1 = (byte) ((uint) (byte) ((uint) (byte) ((uint) num1 & 63U) << 1) | (uint) num2);
-      }
-      return num1;
+            delta %= 8; // Sicherstellen, dass die Rotation innerhalb von 0-7 Bits bleibt
+            return (byte)((input << delta) | (input >> (8 - delta)));
+
+            /*for (int index = 0; index < delta; ++index)
+            {
+                      //  byte num2 = (byte) ((uint) (byte) ((uint) num1 & 64U) >> 6);
+                      num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 63U) << 1)); //| (uint) num2);
+            }*/
+
+
+            return num1;
     }
 
     private byte rotateByRight(byte input, int delta)
@@ -134,12 +141,16 @@ namespace LibRincewind_4._7._2
       delta %= 6;
       ++delta;
       byte num1 = input;
-      for (int index = 0; index < delta; ++index)
-      {
-        byte num2 = (byte) ((uint) (byte) ((uint) num1 & 1U) << 6);
-        num1 = (byte) ((uint) (byte) ((uint) (byte) ((uint) num1 & 126U) >> 1) | (uint) num2);
-      }
-      return num1;
+            /*for (int index = 0; index < delta; ++index)
+            {
+              byte num2 = (byte) ((uint) (byte) ((uint) num1 & 1U) << 6);
+                      num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 126U) >> 1));// | (uint) num2);
+            }*/
+
+            delta %= 8; // Sicherstellen, dass die Rotation innerhalb von 0-7 Bits bleibt
+            return (byte)((input >> delta) | (input << (8 - delta)));
+
+            return num1;
     }
   }
 }

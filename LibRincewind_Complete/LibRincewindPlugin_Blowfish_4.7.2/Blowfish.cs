@@ -41,7 +41,7 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
       for (int index = 0; index < length; ++index)
       {
         long ticks = DateTime.Now.Ticks;
-        iv[index] = (byte) new Random((int) ticks).Next(1, (int) byte.MaxValue);
+        iv[index] = (byte) new Random().Next(1, (int) byte.MaxValue);
       }
       return iv;
     }
