@@ -7,6 +7,7 @@
 using LibRincewind_4._7._2;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -44,6 +45,7 @@ namespace LibRincewindDemo_4._7._2
         private GroupBox groupBox2;
         private GroupBox groupBox3;
         private Label label9;
+        private CheckBox checkBox1;
         bool useRC4 = false;
     public Form1()
     {
@@ -62,9 +64,9 @@ namespace LibRincewindDemo_4._7._2
         byte[] salt1 = null;
         private void button1_Click(object sender, EventArgs e)
     {
-            salt = generateIV(256);
+            salt = CRincewind.QRNG(256);
 
-            salt1 = generateIV(256);
+            salt1 = CRincewind.QRNG(256);
             CCryptData ccryptData = this.libRincewind.encryptCCD(this.textBox3.Text, this.textBox1.Text, this.textBox2.Text,salt,salt1);
       this.textBox4.Text = ccryptData.CryptedData;
       this.textBox5.Text = ccryptData.Key;
@@ -119,6 +121,7 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -246,6 +249,7 @@ namespace LibRincewindDemo_4._7._2
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBox1);
             this.groupBox1.Controls.Add(this.radioButton4);
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton1);
@@ -381,6 +385,17 @@ namespace LibRincewindDemo_4._7._2
             this.label9.TabIndex = 22;
             this.label9.Text = "label9";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(350, 174);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(266, 29);
+            this.checkBox1.TabIndex = 4;
+            this.checkBox1.Text = "Use Quantum RNG API";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -439,17 +454,7 @@ namespace LibRincewindDemo_4._7._2
 
         public byte[] generateIV(int length)
         {
-            byte[] iv = new byte[length];
-            for (int index = 0; index < length; index++)
-            {
-                do
-                {
-                    long ticks = DateTime.Now.Ticks;
-                    iv[index] = (byte)new Random((int)ticks).Next(1, (int)byte.MaxValue);
-                    System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(0, 50));
-                } while (iv[index] == 0);
-            }
-            return iv;
+            return CRincewind.QRNG(length);
         }
         private void button3_Click(object sender, EventArgs e)
         {
@@ -476,8 +481,8 @@ namespace LibRincewindDemo_4._7._2
                         cryptData.CryptedData = this.textBox4.Text;
                         cryptData.Key = this.textBox5.Text;
                         cryptData.IV = this.libRincewind.IV;
-                        cryptData.Salt = Convert.ToBase64String(generateIV(256));
-                        cryptData.Salt1 = Convert.ToBase64String(generateIV(256));
+                        cryptData.Salt = Convert.ToBase64String(CRincewind.QRNG(256));
+                        cryptData.Salt1 = Convert.ToBase64String(CRincewind.QRNG(256));
                         String LRDec = libRincewind.decryptCCD(cryptData, pass1, pass2, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
                         this.textBox8.Invoke(new Action(() =>
                         {
@@ -507,6 +512,11 @@ namespace LibRincewindDemo_4._7._2
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+        public static bool QRNG = false;
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            CRincewind.UseQRNG = checkBox1.Checked;
         }
     }
 }

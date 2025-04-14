@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -19,6 +20,7 @@ namespace LibRincewind_4._7._2
     {
         private IPlugin plugin;
         public byte[] IV;
+        public static bool UseQRNG = false;
 
         public CRincewind(string _plugin, int ivSize = 512)
         {
@@ -27,7 +29,7 @@ namespace LibRincewind_4._7._2
                 if (((IEnumerable<Type>)exportedType.GetInterfaces()).Contains<Type>(typeof(IPlugin)))
                     this.plugin = (IPlugin)Activator.CreateInstance(exportedType);
             }
-            this.IV = this.plugin.generateIV(ivSize);
+            this.IV = QRNG(ivSize);
         }
 
         public CCryptData encryptCCD(string toEncrypt, string password1, string password2, byte[] salt1, byte[] salt2)
@@ -94,15 +96,47 @@ namespace LibRincewind_4._7._2
 
         private byte[] generateRandomKey(string input)
         {
-            byte[] randomKey = new byte[input.Length];
-            for (int index = 0; index < input.Length; ++index)
-            {
-                char ch = (char)new Random().Next(1, (int)byte.MaxValue);
-                randomKey[index] = (byte)ch;
-            }
+            byte[] randomKey = QRNG(input.Length);
             return randomKey;
         }
 
+        public static byte[] QRNG(int bytes)
+        {
+            byte[] bRet = new byte[bytes];
+
+            if (UseQRNG)
+            {
+                String ret = new WebClient().DownloadString("https://lfdr.de/qrng_api/qrng?length=" + bytes.ToString() + "&format=BINARY");
+                ret = ret.Substring(ret.IndexOf("[") + 1);
+                int counter = 0;
+                String[] binNumbers = ret.Split(' ');
+                foreach (String binNumber in binNumbers)
+                {
+                    String bNum = binNumber;
+                    if (binNumber.Contains("]"))
+                        bNum = binNumber.Substring(0, binNumber.IndexOf("]"));
+
+                    byte tmp = 0;
+                    for (int i = 0; i < bNum.Length; i++)
+                    {
+                        tmp |= ((byte)(int.Parse(bNum[i].ToString()) << (7 - i)));
+                    }
+                    bRet[counter] = tmp;
+                    counter++;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < bytes; i++)
+                {
+                    byte b = (byte)new Random().Next(1, 254);
+                    bRet[i] = b;
+                    System.Threading.Thread.Sleep(new Random().Next(10, 200));
+                }
+            }
+            return bRet;
+        }
+        
         private byte rotateByLeft(byte input, int delta)
         {
             delta %= 6;

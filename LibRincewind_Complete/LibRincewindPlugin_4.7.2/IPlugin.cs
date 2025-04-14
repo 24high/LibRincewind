@@ -16,6 +16,6 @@ namespace LibRincewind_4._7._2
 
     byte[] decrypt(byte[] data, string password, byte[] IV = null, byte[] salt = null, byte[] salt1 = null);
 
-    byte[] generateIV(int length);
+   
   }
 }

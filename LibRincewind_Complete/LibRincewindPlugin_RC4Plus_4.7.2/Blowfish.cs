@@ -47,19 +47,5 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
 
         }
 
-        public byte[] generateIV(int length)
-    {
-      byte[] iv = new byte[length];
-      for (int index = 0; index < length; index++)
-      {
-                do
-                {
-                    long ticks = DateTime.Now.Ticks;
-                    iv[index] = (byte)new Random((int)ticks).Next(1, (int)byte.MaxValue);
-                    System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(0, 50));
-                } while (iv[index] == 0);
-      }
-      return iv;
-    }
   }
 }
