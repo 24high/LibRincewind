@@ -72,6 +72,18 @@
       <Project>{5a34cf29-9931-4760-8ef2-78db2038f0ef}</Project>
       <Name>LibRincewindPlugin_RC4Plus_4.7.2</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindRNG_Generic_API\LibRincewindRNG_Generic_API.csproj">
+      <Project>{f47b98f2-44ce-4f70-8098-3adb1e837d5a}</Project>
+      <Name>LibRincewindRNG_Generic_API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindRNG_HardwareRNG\LibRincewindRNG_HardwareRNG.csproj">
+      <Project>{c49e13f6-86ec-4897-9afd-65147a0d7fe8}</Project>
+      <Name>LibRincewindRNG_HardwareRNG</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LibRincewindRNG_QRNG-API\LibRincewindRNG_QRNG-LFDR.csproj">
+      <Project>{18abc81b-353f-4edc-ac62-c92ae682aa6a}</Project>
+      <Name>LibRincewindRNG_QRNG-LFDR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\LibRincewind_4.7.2\LibRincewind_4.7.2\LibRincewind_4.7.2.csproj">
       <Project>{7ad2c1b4-0821-4fd7-a004-e391f2056101}</Project>
       <Name>LibRincewind_4.7.2</Name>

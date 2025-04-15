@@ -21,7 +21,7 @@ namespace LibRincewind_4._7._2
     {
         private IPlugin plugin;
         public byte[] IV;
-        private static IRng Rng = null;
+        public static IRng Rng = null;
 
         public CRincewind(string _plugin, string _rng,int ivSize = 512)
         {
@@ -30,6 +30,7 @@ namespace LibRincewind_4._7._2
                 if (((IEnumerable<Type>)exportedType.GetInterfaces()).Contains<Type>(typeof(IPlugin)))
                     this.plugin = (IPlugin)Activator.CreateInstance(exportedType);
             }
+            CRincewind.Rng = null;
 
             if (_rng != "")
             {

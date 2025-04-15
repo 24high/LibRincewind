@@ -47,13 +47,15 @@ namespace LibRincewindDemo_4._7._2
         private Label label9;
         private CheckBox checkBox1;
         bool useRC4 = false;
+        String SRng = "";
+        String SEnc = "";
+        int IVSize = 8;
     public Form1()
     {
       this.InitializeComponent();
-      if(!useRC4)
-        this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_Blowfish_4.7.2.dll", 8);
-      else
-                this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll", 8);
+            SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_Blowfish_4.7.2.dll";
+            this.libRincewind = new CRincewind(SEnc, "", 8);
+            
             
     }
 
@@ -110,6 +112,7 @@ namespace LibRincewindDemo_4._7._2
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.textBox6 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.radioButton4 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
@@ -121,7 +124,6 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -260,6 +262,17 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Algorithm";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(350, 174);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(266, 29);
+            this.checkBox1.TabIndex = 4;
+            this.checkBox1.Text = "Use Quantum RNG API";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // radioButton4
             // 
             this.radioButton4.AutoSize = true;
@@ -385,17 +398,6 @@ namespace LibRincewindDemo_4._7._2
             this.label9.TabIndex = 22;
             this.label9.Text = "label9";
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(350, 174);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(266, 29);
-            this.checkBox1.TabIndex = 4;
-            this.checkBox1.Text = "Use Quantum RNG API";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -422,16 +424,24 @@ namespace LibRincewindDemo_4._7._2
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
-            if(radioButton1.Checked)
-                this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_Blowfish_4.7.2.dll", 8);
+            if (radioButton1.Checked)
+            {
+                IVSize = 8;
+                SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_Blowfish_4.7.2.dll";
+                this.libRincewind = new CRincewind(SEnc, SRng, 8);
+            }
 
         }
 
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
-            if(radioButton2.Checked)
-                this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll", 16);
-
+            if (radioButton2.Checked)
+            {
+                IVSize = 16;
+                SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll";
+                this.libRincewind = new CRincewind(SEnc, SRng, 16);
+                
+            }
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -441,9 +451,12 @@ namespace LibRincewindDemo_4._7._2
 
         private void radioButton4_CheckedChanged(object sender, EventArgs e)
         {
-            if(radioButton4.Checked)
-                this.libRincewind = new CRincewind(AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_ChaCha20_4.7.2.dll", 96/8);
-
+            if (radioButton4.Checked)
+            {
+                IVSize = 96 / 8;
+                SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_ChaCha20_4.7.2.dll";
+                this.libRincewind = new CRincewind(SEnc, SRng, 96 / 8);
+            }
         }
 
         private void groupBox3_Enter(object sender, EventArgs e)
@@ -516,7 +529,15 @@ namespace LibRincewindDemo_4._7._2
         public static bool QRNG = false;
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            CRincewind.UseQRNG = checkBox1.Checked;
+            if (checkBox1.Checked)
+            {
+                SRng=AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindRNG_QRNG-API.dll";
+            }
+            else
+            {
+                SRng = "";
+            }
+            this.libRincewind = new CRincewind(SEnc, SRng, IVSize);
         }
     }
 }
