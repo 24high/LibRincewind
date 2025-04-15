@@ -18,4 +18,9 @@ namespace LibRincewind_4._7._2
 
    
   }
+
+  public interface IRng
+    {
+        byte[] genBytes(int num, int min, int max, object[] parameters);
+    }
 }

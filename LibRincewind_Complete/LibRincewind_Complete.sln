@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_RC4Plus_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindPlugin_ChaCha20_4.7.2", "LibRincewindPlugin_ChaCha20_4.7.2\LibRincewindPlugin_ChaCha20_4.7.2.csproj", "{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindRNG_QRNG-LFDR", "LibRincewindRNG_QRNG-API\LibRincewindRNG_QRNG-LFDR.csproj", "{18ABC81B-353F-4EDC-AC62-C92AE682AA6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindRNG_Generic_API", "LibRincewindRNG_Generic_API\LibRincewindRNG_Generic_API.csproj", "{F47B98F2-44CE-4F70-8098-3ADB1E837D5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibRincewindRNG_HardwareRNG", "LibRincewindRNG_HardwareRNG\LibRincewindRNG_HardwareRNG.csproj", "{C49E13F6-86EC-4897-9AFD-65147A0D7FE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +51,18 @@ Global
 		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF984EE1-6D6D-4466-A6D1-1A7169F2B6B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18ABC81B-353F-4EDC-AC62-C92AE682AA6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18ABC81B-353F-4EDC-AC62-C92AE682AA6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18ABC81B-353F-4EDC-AC62-C92AE682AA6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18ABC81B-353F-4EDC-AC62-C92AE682AA6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F47B98F2-44CE-4F70-8098-3ADB1E837D5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F47B98F2-44CE-4F70-8098-3ADB1E837D5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F47B98F2-44CE-4F70-8098-3ADB1E837D5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F47B98F2-44CE-4F70-8098-3ADB1E837D5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C49E13F6-86EC-4897-9AFD-65147A0D7FE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C49E13F6-86EC-4897-9AFD-65147A0D7FE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C49E13F6-86EC-4897-9AFD-65147A0D7FE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C49E13F6-86EC-4897-9AFD-65147A0D7FE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

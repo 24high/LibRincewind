@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -20,15 +21,27 @@ namespace LibRincewind_4._7._2
     {
         private IPlugin plugin;
         public byte[] IV;
-        public static bool UseQRNG = false;
+        private static IRng Rng = null;
 
-        public CRincewind(string _plugin, int ivSize = 512)
+        public CRincewind(string _plugin, string _rng,int ivSize = 512)
         {
             foreach (Type exportedType in Assembly.LoadFile(_plugin).GetExportedTypes())
             {
                 if (((IEnumerable<Type>)exportedType.GetInterfaces()).Contains<Type>(typeof(IPlugin)))
                     this.plugin = (IPlugin)Activator.CreateInstance(exportedType);
             }
+
+            if (_rng != "")
+            {
+                foreach (Type exportedType in Assembly.LoadFile(_rng).GetExportedTypes())
+                {
+                    if (((IEnumerable<Type>)exportedType.GetInterfaces()).Contains<Type>(typeof(IRng)))
+                        CRincewind.Rng = (IRng)Activator.CreateInstance(exportedType);
+                }
+            }
+
+
+
             this.IV = QRNG(ivSize);
         }
 
@@ -100,32 +113,10 @@ namespace LibRincewind_4._7._2
             return randomKey;
         }
 
-        public static byte[] QRNG(int bytes)
+        public static byte[] QRNG(int bytes, int min = 0, int max = -1, object[] parameters = null)
         {
             byte[] bRet = new byte[bytes];
-
-            if (UseQRNG)
-            {
-                String ret = new WebClient().DownloadString("https://lfdr.de/qrng_api/qrng?length=" + bytes.ToString() + "&format=BINARY");
-                ret = ret.Substring(ret.IndexOf("[") + 1);
-                int counter = 0;
-                String[] binNumbers = ret.Split(' ');
-                foreach (String binNumber in binNumbers)
-                {
-                    String bNum = binNumber;
-                    if (binNumber.Contains("]"))
-                        bNum = binNumber.Substring(0, binNumber.IndexOf("]"));
-
-                    byte tmp = 0;
-                    for (int i = 0; i < bNum.Length; i++)
-                    {
-                        tmp |= ((byte)(int.Parse(bNum[i].ToString()) << (7 - i)));
-                    }
-                    bRet[counter] = tmp;
-                    counter++;
-                }
-            }
-            else
+            if(Rng==null)
             {
                 for (int i = 0; i < bytes; i++)
                 {
@@ -133,6 +124,10 @@ namespace LibRincewind_4._7._2
                     bRet[i] = b;
                     System.Threading.Thread.Sleep(new Random().Next(10, 200));
                 }
+            }
+            else
+            {
+                bRet= Rng.genBytes(bytes,min,max,parameters);
             }
             return bRet;
         }
