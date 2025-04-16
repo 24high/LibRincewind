@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -22,9 +23,12 @@ namespace LibRincewind_4._7._2
         private IPlugin plugin;
         public byte[] IV;
         public static IRng Rng = null;
+        public static int[] rotations;
+        public static int[] rotationsDec;
 
         public CRincewind(string _plugin, string _rng,int ivSize = 512)
         {
+            rotations=new int[_plugin.Length];
             foreach (Type exportedType in Assembly.LoadFile(_plugin).GetExportedTypes())
             {
                 if (((IEnumerable<Type>)exportedType.GetInterfaces()).Contains<Type>(typeof(IPlugin)))
@@ -45,22 +49,37 @@ namespace LibRincewind_4._7._2
 
             this.IV = QRNG(ivSize);
         }
-
+        static byte[] xor;
         public CCryptData encryptCCD(string toEncrypt, string password1, string password2, byte[] salt1, byte[] salt2)
         {
             byte[] randomKey = this.generateRandomKey(toEncrypt);
             byte[] seed = salt1;
             byte[] seed1 = salt2;
             byte[] bytes = Encoding.ASCII.GetBytes(toEncrypt.ToCharArray());
+            int min = 999999999;
+        
+            xor=QRNG(randomKey.Length);
+
             for (int index = 0; index < randomKey.Length; ++index)
             {
+                
+                int max=new Random().Next(4);
+                System.Threading.Thread.Sleep(new Random((int)DateTime.Now.Ticks).Next(10, 200));
+                rotations[index]=0;
+                byte tmp = bytes[index];
                 do
                 {
-                    bytes[index] = this.rotateByLeft(bytes[index], (int)randomKey[index]);
+                    bytes[index] = this.rotateByRight(bytes[index], (int)randomKey[index]);
+                    rotations[index]++;
+
+
                 }
                 while (bytes[index] < (byte)36 || bytes[index] > (byte)126);
+                //bytes[index] ^= xor[index];
+
+
             }
-            byte[] inArray1 = this.plugin.encrypt(bytes, password1, this.IV, seed, seed1);
+            byte[] inArray1 = bytes;//this.plugin.encrypt(bytes, password1, this.IV, seed, seed1);
             byte[] inArray2 = this.plugin.encrypt(randomKey, password2, this.IV, seed, seed1);
             return new CCryptData()
             {
@@ -72,45 +91,64 @@ namespace LibRincewind_4._7._2
             };
         }
 
-        public string encryptString(string toEncrypt, string password1, string password2, byte[] salt1, byte[] salt2)
+        public string encryptString(string toEncrypt, string password1, string password2)
         {
-            CCryptData graph = this.encryptCCD(toEncrypt, password1, password2,salt1, salt2);
+            CCryptData graph = this.encryptCCD(toEncrypt, password1, password2,QRNG(256), QRNG(256));
             BinaryFormatter binaryFormatter = new BinaryFormatter();
             MemoryStream serializationStream = new MemoryStream();
             binaryFormatter.Serialize((Stream)serializationStream, (object)graph);
             return Convert.ToBase64String(serializationStream.GetBuffer());
         }
 
-        public string decryptCCD(CCryptData cryptData, string password1, string password2, byte[] salt1, byte[] salt2)
+        public string decryptCCD(CCryptData cryptData, string password1, string password2)
         {
             byte[] data1 = Convert.FromBase64String(cryptData.CryptedData);
             byte[] data2 = Convert.FromBase64String(cryptData.Key);
-            byte[] numArray1 = this.plugin.decrypt(data1, password1, cryptData.IV, salt1,salt2);
-            byte[] numArray2 = this.plugin.decrypt(data2, password2, cryptData.IV,salt1, salt2);
+            byte[] numArray1 = data1;// this.plugin.decrypt(data1, password1, cryptData.IV, Convert.FromBase64String(cryptData.Salt),Convert.FromBase64String( cryptData.Salt1));
+            byte[] numArray2 = this.plugin.decrypt(data2, password2, cryptData.IV, Convert.FromBase64String(cryptData.Salt), Convert.FromBase64String(cryptData.Salt1));
             byte[] numArray3 = numArray1;
             char[] chArray = new char[numArray3.Length];
+            rotationsDec = new int[numArray3.Length];
+            xor = QRNG(data1.Length);
+    
             for (int index = 0; index < numArray2.Length; ++index)
             {
+             
                 int num = 0;
+                rotationsDec[index]=0;
+                
+                //numArray3[index] =(byte) (numArray3[index] ^ xor[index]);
+                
                 do
                 {
-                    numArray3[index] = this.rotateByRight(numArray3[index], (int)numArray2[index]);
-                    ++num;
+                    rotationsDec[index]++;
+                    numArray3[index] = this.rotateByLeft(numArray3[index], (int)numArray2[index]);
+                    num++;
+                    if(num>2)
+                    {
+                        numArray3[index] = 254;
+                        break;
+                    }
+                    //if (num > 19)
+                      //  rotationsDec[index] = 0;
+                    // } while (false);
                 }
-                while ((numArray3[index] < (byte)36 || numArray3[index] > (byte)126) && numArray3[index] > (byte)0 && num<20);
+                while ((numArray3[index] < (byte)36 || numArray3[index] > (byte)126));
+                
                 chArray[index] = (char)numArray3[index];
+                
             }
             return new string(chArray);
         }
 
-        public string decryptString(string cryptDataB64, string password1, string password2, byte[] salt1, byte[] salt2)
+        public string decryptString(string cryptDataB64, string password1, string password2)
         {
-            return this.decryptCCD((CCryptData)new BinaryFormatter().Deserialize((Stream)new MemoryStream(Convert.FromBase64String(cryptDataB64))), password1, password2,salt1,salt2);
+            return this.decryptCCD((CCryptData)new BinaryFormatter().Deserialize((Stream)new MemoryStream(Convert.FromBase64String(cryptDataB64))), password1, password2);
         }
 
         private byte[] generateRandomKey(string input)
         {
-            byte[] randomKey = QRNG(input.Length);
+            byte[] randomKey = QRNG(input.Length,1,254);
             return randomKey;
         }
 
@@ -132,7 +170,7 @@ namespace LibRincewind_4._7._2
             }
             return bRet;
         }
-        
+      
         private byte rotateByLeft(byte input, int delta)
         {
             delta %= 6;
@@ -142,10 +180,11 @@ namespace LibRincewind_4._7._2
             {
                 byte num2 = (byte)((uint)(byte)((uint)num1 & 64U) >> 6);
                 num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 63U) << 1) | (uint)num2);
+                
             }
+
             return num1;
         }
-
         private byte rotateByRight(byte input, int delta)
         {
             delta %= 6;
@@ -157,6 +196,15 @@ namespace LibRincewind_4._7._2
                 num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 126U) >> 1) | (uint)num2);
             }
             return num1;
-        }
+       }
+  
+  /*      byte rotateByLeft(byte value, int n)
+        {
+            n %= 8;
+            // Linksrotieren mit Kreisrotation
+            return (byte)((value << n) | (value >> (8 - n)) & 0xFF);
+        }*/
+  
+  
     }
 }

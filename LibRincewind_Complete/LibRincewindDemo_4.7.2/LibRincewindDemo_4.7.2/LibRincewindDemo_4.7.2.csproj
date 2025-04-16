@@ -31,6 +31,26 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -59,10 +79,6 @@
     <ProjectReference Include="..\..\LibRincewindPlugin_4.7.2\LibRincewindPlugin_4.7.2.csproj">
       <Project>{0887b565-cab4-4048-87f4-c67471ec438a}</Project>
       <Name>LibRincewindPlugin_4.7.2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\LibRincewindPlugin_Blowfish_4.7.2\LibRincewindPlugin_Blowfish_4.7.2.csproj">
-      <Project>{14f0e7b0-c856-4b8f-a1b7-511a23070460}</Project>
-      <Name>LibRincewindPlugin_Blowfish_4.7.2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\LibRincewindPlugin_ChaCha20_4.7.2\LibRincewindPlugin_ChaCha20_4.7.2.csproj">
       <Project>{ff984ee1-6d6d-4466-a6d1-1a7169f2b6b3}</Project>
