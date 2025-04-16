@@ -74,7 +74,7 @@ namespace LibRincewind_4._7._2
 
 
                 }
-                while (bytes[index] < (byte)36 || bytes[index] > (byte)126);
+                while (bytes[index] < (byte)32 || bytes[index] > (byte)126);
                 //bytes[index] ^= xor[index];
 
 
@@ -133,7 +133,7 @@ namespace LibRincewind_4._7._2
                       //  rotationsDec[index] = 0;
                     // } while (false);
                 }
-                while ((numArray3[index] < (byte)36 || numArray3[index] > (byte)126));
+                while ((numArray3[index] < (byte)32 || numArray3[index] > (byte)126));
                 
                 chArray[index] = (char)numArray3[index];
                 
@@ -173,8 +173,8 @@ namespace LibRincewind_4._7._2
       
         private byte rotateByLeft(byte input, int delta)
         {
-            delta %= 6;
-            ++delta;
+            //delta %= 6;
+            //++delta;
             byte num1 = input;
             for (int index = 0; index < delta; ++index)
             {
@@ -187,8 +187,8 @@ namespace LibRincewind_4._7._2
         }
         private byte rotateByRight(byte input, int delta)
         {
-            delta %= 6;
-            ++delta;
+            //delta %= 6;
+            //++delta;
             byte num1 = input;
             for (int index = 0; index < delta; ++index)
             {
