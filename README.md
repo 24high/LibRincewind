@@ -11,8 +11,10 @@ LibRincewind combines any symmetrical algorithm with a rotational algorithm so t
 <br>
 Updates<br>
 17.04.2025
-The encryption of the rotaded data has been removed<br>
-Updated the demo<br><br>
+-The encryption of the rotaded data has been removed<br>
+-Updated the demo<br><br>
+WIP<br>
+A password manager using LibRincewind is currently being developed.<br><br>
 How does it work?<br>
 <br>
 1.) The plain text gets encrypted using a password<br>
