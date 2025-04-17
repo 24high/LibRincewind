@@ -10,7 +10,7 @@ Normal encryption of plain text passwords can theoretically be cracked because d
 LibRincewind combines any symmetrical algorithm with a rotational algorithm so that false tries can't be distinguished from valid ones.<br>
 <br>
 Updates<br>
-17.04.2025
+17.04.2025<br>
 -The encryption of the rotaded data has been removed<br>
 -Updated the demo<br><br>
 WIP<br>
