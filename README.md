@@ -26,9 +26,14 @@ Caveats:<br>
 <br>
 -The length of the plain text can be guessed, because it equals the length of the encryption/decryption key<br>
 -The algorithm is still prone to wordlist attacks<br>
--The Demo is using Blowfish as the base algorithm, which is vulnerable to attacks using quantum computers. Yet the library is independend of the base algorithm, thus Blowfish can easily be replaced with AES or RC6 by creating a custom Plugin.<br>
--The Demo is using the DotNet Pseudo-RNG. Replace it with a QRNG in real world applications.<br>
--The method practically halves the password length compared to the really used password.<br>
+-The Rotation is using normal bitshifts, no circular shifting. thus there is some statistical imablance, which could make it possible to guess which Symbols could be correct.
+It also Limits the key to 6 Symbols per byte.
+<br><br>
+so when encrypting an 8 letter Password, it will result in<br>
+6^8 = 1.679.616 <br>
+false positives which can't be distinguished from the real Password, while requiring the same computation power for an attack.<br>
+
+
 
 <br>
 Usage:<br>
