@@ -173,27 +173,27 @@ namespace LibRincewind_4._7._2
       
         private byte rotateByLeft(byte input, int delta)
         {
-            //delta %= 6;
-            //++delta;
+            delta %= 6;
+            ++delta;
             byte num1 = input;
             for (int index = 0; index < delta; ++index)
             {
                 byte num2 = (byte)((uint)(byte)((uint)num1 & 64U) >> 6);
-                num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 63U) << 1) | (uint)num2);
-                
+                num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 63U) << 1) | (uint)num2);                
             }
 
             return num1;
         }
         private byte rotateByRight(byte input, int delta)
         {
-            //delta %= 6;
-            //++delta;
+            delta %= 6;
+            ++delta;
             byte num1 = input;
             for (int index = 0; index < delta; ++index)
             {
                 byte num2 = (byte)((uint)(byte)((uint)num1 & 1U) << 6);
                 num1 = (byte)((uint)(byte)((uint)(byte)((uint)num1 & 126U) >> 1) | (uint)num2);
+                
             }
             return num1;
        }

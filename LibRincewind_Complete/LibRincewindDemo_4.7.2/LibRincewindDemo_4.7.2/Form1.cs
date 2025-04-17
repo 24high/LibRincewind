@@ -19,7 +19,6 @@ namespace LibRincewindDemo_4._7._2
   {
     private CRincewind libRincewind = (CRincewind) null;
     private IContainer components = (IContainer) null;
-    private Label label1;
     private Label label2;
     private Label label3;
     private Button button1;
@@ -27,7 +26,6 @@ namespace LibRincewindDemo_4._7._2
     private Label label5;
     private Label label6;
     private Button button2;
-    private TextBox textBox1;
     private TextBox textBox2;
     private TextBox textBox3;
     private TextBox textBox4;
@@ -72,7 +70,7 @@ namespace LibRincewindDemo_4._7._2
 
             salt1 = CRincewind.QRNG(256);
             //ccryptData = this.libRincewind.encryptCCD(this.textBox3.Text, this.textBox1.Text, this.textBox2.Text,salt,salt1);
-            ccryptData = this.libRincewind.encryptString(textBox3.Text, textBox1.Text, textBox2.Text);
+            ccryptData = this.libRincewind.encryptString(textBox3.Text, "", textBox2.Text);
       this.textBox4.Text = ccryptData;
             lblRotationsEnc.Text = "";
             int gesRotation = 0;
@@ -93,10 +91,8 @@ namespace LibRincewindDemo_4._7._2
             cryptData.Key = this.textBox5.Text;
             cryptData.IV = this.libRincewind.IV;
 
-
-            string text1 = this.textBox1.Text;
             string text2 = this.textBox2.Text;
-            this.textBox6.Text = libRincewind.decryptString(ccryptData, text1, text2);
+            this.textBox6.Text = libRincewind.decryptString(ccryptData, "", text2);
             lblRotationsDec.Text = "";
             float gesRotations = 0;
             foreach (int rotation in CRincewind.rotationsDec)
@@ -117,7 +113,6 @@ namespace LibRincewindDemo_4._7._2
 
     private void InitializeComponent()
     {
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -125,7 +120,6 @@ namespace LibRincewindDemo_4._7._2
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
@@ -140,39 +134,30 @@ namespace LibRincewindDemo_4._7._2
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.lblRotationsEnc = new System.Windows.Forms.Label();
-            this.lblRotationsDec = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
+            this.lblRotationsDec = new System.Windows.Forms.Label();
+            this.lblRotationsEnc = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(130, 25);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Password 1:";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 79);
+            this.label2.Location = new System.Drawing.Point(6, 41);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(130, 25);
+            this.label2.Size = new System.Drawing.Size(112, 25);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Password 2:";
+            this.label2.Text = "Password:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 154);
+            this.label3.Location = new System.Drawing.Point(6, 103);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(175, 25);
             this.label3.TabIndex = 2;
@@ -181,7 +166,7 @@ namespace LibRincewindDemo_4._7._2
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(474, 210);
+            this.button1.Location = new System.Drawing.Point(474, 147);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(125, 38);
             this.button1.TabIndex = 3;
@@ -192,7 +177,7 @@ namespace LibRincewindDemo_4._7._2
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 273);
+            this.label4.Location = new System.Drawing.Point(18, 213);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(115, 25);
             this.label4.TabIndex = 4;
@@ -201,7 +186,7 @@ namespace LibRincewindDemo_4._7._2
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(18, 308);
+            this.label5.Location = new System.Drawing.Point(18, 248);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(163, 25);
             this.label5.TabIndex = 5;
@@ -210,7 +195,7 @@ namespace LibRincewindDemo_4._7._2
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 340);
+            this.label6.Location = new System.Drawing.Point(18, 280);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(157, 25);
             this.label6.TabIndex = 6;
@@ -218,7 +203,7 @@ namespace LibRincewindDemo_4._7._2
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(474, 378);
+            this.button2.Location = new System.Drawing.Point(474, 318);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(125, 38);
             this.button2.TabIndex = 7;
@@ -226,17 +211,9 @@ namespace LibRincewindDemo_4._7._2
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(199, 44);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(400, 31);
-            this.textBox1.TabIndex = 8;
-            this.textBox1.UseSystemPasswordChar = true;
-            // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(201, 81);
+            this.textBox2.Location = new System.Drawing.Point(201, 43);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(400, 31);
             this.textBox2.TabIndex = 9;
@@ -244,28 +221,28 @@ namespace LibRincewindDemo_4._7._2
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(199, 158);
+            this.textBox3.Location = new System.Drawing.Point(199, 100);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(400, 31);
             this.textBox3.TabIndex = 10;
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(199, 267);
+            this.textBox4.Location = new System.Drawing.Point(199, 207);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(400, 31);
             this.textBox4.TabIndex = 11;
             // 
             // textBox5
             // 
-            this.textBox5.Location = new System.Drawing.Point(199, 304);
+            this.textBox5.Location = new System.Drawing.Point(199, 244);
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(400, 31);
             this.textBox5.TabIndex = 12;
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(199, 341);
+            this.textBox6.Location = new System.Drawing.Point(199, 281);
             this.textBox6.Name = "textBox6";
             this.textBox6.ReadOnly = true;
             this.textBox6.Size = new System.Drawing.Size(400, 31);
@@ -286,7 +263,7 @@ namespace LibRincewindDemo_4._7._2
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(350, 174);
+            this.checkBox1.Location = new System.Drawing.Point(301, 174);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(266, 29);
             this.checkBox1.TabIndex = 4;
@@ -351,7 +328,6 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox2.Controls.Add(this.textBox4);
             this.groupBox2.Controls.Add(this.textBox3);
             this.groupBox2.Controls.Add(this.textBox2);
-            this.groupBox2.Controls.Add(this.textBox1);
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label5);
@@ -359,10 +335,9 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(22, 247);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(605, 429);
+            this.groupBox2.Size = new System.Drawing.Size(605, 388);
             this.groupBox2.TabIndex = 22;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Encrypt/Decrypt";
@@ -378,49 +353,13 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox3.Controls.Add(this.textBox8);
             this.groupBox3.Controls.Add(this.label8);
             this.groupBox3.Controls.Add(this.button3);
-            this.groupBox3.Location = new System.Drawing.Point(22, 686);
+            this.groupBox3.Location = new System.Drawing.Point(22, 665);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(1754, 365);
+            this.groupBox3.Size = new System.Drawing.Size(599, 365);
             this.groupBox3.TabIndex = 23;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Test failures";
             this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(256, 218);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(0, 25);
-            this.label9.TabIndex = 22;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(66, 218);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(102, 25);
-            this.label7.TabIndex = 23;
-            this.label7.Text = "Error rate";
-            // 
-            // lblRotationsEnc
-            // 
-            this.lblRotationsEnc.AutoSize = true;
-            this.lblRotationsEnc.Location = new System.Drawing.Point(266, 262);
-            this.lblRotationsEnc.Name = "lblRotationsEnc";
-            this.lblRotationsEnc.Size = new System.Drawing.Size(144, 25);
-            this.lblRotationsEnc.TabIndex = 24;
-            this.lblRotationsEnc.Text = "Rotations enc";
-            // 
-            // lblRotationsDec
-            // 
-            this.lblRotationsDec.AutoSize = true;
-            this.lblRotationsDec.Location = new System.Drawing.Point(267, 299);
-            this.lblRotationsDec.Name = "lblRotationsDec";
-            this.lblRotationsDec.Size = new System.Drawing.Size(144, 25);
-            this.lblRotationsDec.TabIndex = 25;
-            this.lblRotationsDec.Text = "Rotations dec";
-            this.lblRotationsDec.Click += new System.EventHandler(this.lblRotationsDec_Click);
             // 
             // label10
             // 
@@ -440,12 +379,48 @@ namespace LibRincewindDemo_4._7._2
             this.label11.TabIndex = 26;
             this.label11.Text = "Rotations enc";
             // 
+            // lblRotationsDec
+            // 
+            this.lblRotationsDec.AutoSize = true;
+            this.lblRotationsDec.Location = new System.Drawing.Point(222, 299);
+            this.lblRotationsDec.Name = "lblRotationsDec";
+            this.lblRotationsDec.Size = new System.Drawing.Size(144, 25);
+            this.lblRotationsDec.TabIndex = 25;
+            this.lblRotationsDec.Text = "Rotations dec";
+            this.lblRotationsDec.Click += new System.EventHandler(this.lblRotationsDec_Click);
+            // 
+            // lblRotationsEnc
+            // 
+            this.lblRotationsEnc.AutoSize = true;
+            this.lblRotationsEnc.Location = new System.Drawing.Point(222, 262);
+            this.lblRotationsEnc.Name = "lblRotationsEnc";
+            this.lblRotationsEnc.Size = new System.Drawing.Size(144, 25);
+            this.lblRotationsEnc.TabIndex = 24;
+            this.lblRotationsEnc.Text = "Rotations enc";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(66, 218);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(102, 25);
+            this.label7.TabIndex = 23;
+            this.label7.Text = "Error rate";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(256, 218);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(0, 25);
+            this.label9.TabIndex = 22;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(1793, 1176);
+            this.ClientSize = new System.Drawing.Size(654, 1052);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
