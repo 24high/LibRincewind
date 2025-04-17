@@ -18,9 +18,8 @@ WIP<br>
 A password manager using LibRincewind is currently being developed.<br><br>
 How does it work?<br>
 <br>
-1.) The plain text gets encrypted using a password<br>
-2.) The encrypted result is rotated using a random key for each character until it is valid ASCII<br>
-3.) The key gets encrypted with another password<br>
+1.) The encrypted result is rotated using a random key for each character until it is valid ASCII<br>
+2.) The key gets encrypted with another password<br>
 <br>
 Caveats:<br>
 <br>
