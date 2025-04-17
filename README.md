@@ -26,12 +26,12 @@ Caveats:<br>
 <br>
 -The length of the plain text can be guessed, because it equals the length of the encryption/decryption key<br>
 -The algorithm is still prone to wordlist attacks<br>
--The Rotation is using normal bitshifts, no circular shifting. thus there is some statistical imablance, which could make it possible to guess which Symbols could be correct.
-It also Limits the key to 6 Symbols per byte.
+-The Rotation is using normal bitshifts, no circular shifting. thus there is some statistical imablance, which could make it possible to guess which symbols could be correct.
+It also limits the key to 6 symbols per byte.
 <br><br>
-so when encrypting an 8 letter Password, it will result in<br>
+so when encrypting an 8 letter password, it will result in<br>
 6^8 = 1.679.616 <br>
-false positives which can't be distinguished from the real Password, while requiring the same computation power for an attack.<br>
+false positives which can't be distinguished from the real password, while requiring the same computation power for an attack.<br>
 
 
 
