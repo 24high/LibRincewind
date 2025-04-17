@@ -5,7 +5,7 @@ A bruteforce protected aproach for encryption using plain text ASCII passwords.<
 What is it about?<br>
 <br>
 Normal encryption of plain text passwords can theoretically be cracked because decryption attempts with a failure password will result in non-ASCII data.<br>
-(Known Key Space Attack)<br>
+<br>
 <br>
 LibRincewind combines any symmetrical algorithm with a rotational algorithm so that false tries can't be distinguished from valid ones.<br>
 <br>
