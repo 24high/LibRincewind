@@ -29,15 +29,7 @@ Usage:<br>
 Encryption of passwords using a main password (password managers):<br>
 CRincewind rw=new CRincewind("pluginlibrary.dll", 512);<br>
 String enc=rw.encryptString("data","password1","password2");<br>
-String dec=rw.decryptString(enc,"password1","password2");<br>
-<br>
-Password authentication (password login):<br>
-CRincewind rw=new CRincewind("pluginlibrary.dll", 512):<br>
-//store this in the db<br>
-String enc=rw.generatePwAuth(password);<br>
-//test for validity<br>
-bool valid=isPwAuthValid(password,enc);<br>
-<br>
+String dec=rw.decryptString(enc,"password1","password2");<br><br>
 Creating custom plugins:<br>
 <br>
 Implement the interface found in LibRincewindPlugin.<br>
