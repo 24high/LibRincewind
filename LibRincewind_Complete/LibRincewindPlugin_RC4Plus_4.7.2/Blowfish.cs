@@ -25,9 +25,9 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);//!!!
-            byte[] key = pdb.GetBytes(256/8);
+            byte[] key = pdb.GetBytes(64);
 
-            RC4PlusImproved rc4 = new RC4PlusImproved(key,IV, salt,salt1);
+            QuantumResistantRC4 rc4 = new QuantumResistantRC4(key,salt,salt1);
             return rc4.EncryptDecrypt(data);
 
 
@@ -38,10 +38,10 @@ namespace LibRincewindPlugin_Blowfish_4._7._2
         {
 
             Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(password, IV);
-            byte[] key = pdb.GetBytes(256/8);
+            byte[] key = pdb.GetBytes(64);
 
 
-            RC4PlusImproved rc4 = new RC4PlusImproved(key,IV, salt,salt1);
+            QuantumResistantRC4 rc4 = new QuantumResistantRC4(key, salt,salt1);
             return rc4.EncryptDecrypt(data);
 
 

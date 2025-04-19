@@ -444,7 +444,7 @@ namespace LibRincewindDemo_4._7._2
         {
             if (radioButton2.Checked)
             {
-                IVSize = 16;
+                IVSize = 64;
                 SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll";
                 this.libRincewind = new CRincewind(SEnc, SRng, 16);
                 
