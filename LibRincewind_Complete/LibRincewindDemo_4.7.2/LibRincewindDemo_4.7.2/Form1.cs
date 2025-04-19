@@ -55,7 +55,7 @@ namespace LibRincewindDemo_4._7._2
         this.InitializeComponent();
         IVSize = 16;
         SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll";
-        this.libRincewind = new CRincewind(SEnc, SRng, 16);
+        this.libRincewind = new CRincewind(SEnc, SRng, 64);
     }
 
     private void Form1_Load(object sender, EventArgs e)
@@ -341,6 +341,7 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox2.TabIndex = 22;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Encrypt/Decrypt";
+            this.groupBox2.Enter += new System.EventHandler(this.groupBox2_Enter);
             // 
             // groupBox3
             // 
@@ -552,6 +553,11 @@ namespace LibRincewindDemo_4._7._2
         }
 
         private void lblRotationsDec_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBox2_Enter(object sender, EventArgs e)
         {
 
         }
