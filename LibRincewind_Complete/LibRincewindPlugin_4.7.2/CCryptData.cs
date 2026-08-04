@@ -23,5 +23,13 @@ namespace LibRincewind_4._7._2
 
     public byte[] IV { get; set; }
         public string Salt1 { get; set; }
+
+        /// <summary>
+        /// Argon2id cost parameters used to derive this record, e.g.
+        /// "argon2id;m=65536;t=3;p=4". Public metadata, not key material: it is here so a
+        /// record stays readable after the application changes its default cost settings.
+        /// Knowing the parameters gives an attacker no way to test a candidate password.
+        /// </summary>
+        public string KdfParams { get; set; }
     }
 }
