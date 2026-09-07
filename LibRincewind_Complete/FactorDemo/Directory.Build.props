@@ -1,0 +1,12 @@
+<Project>
+
+  <!--
+    Intentionally shields this net8.0 demo from the solution-root
+    Directory.Build.props, which forces net472 + a .NET Framework reference-
+    assemblies PackageReference and sets EnableDefaultItems=false. MSBuild
+    imports only the nearest Directory.Build.props walking up the tree, so the
+    mere presence of this (near-empty) file stops that inheritance. We do NOT
+    import the parent — this project stands alone.
+  -->
+
+</Project>

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(dotnet --list-sdks)",
-      "Bash(mono --version)"
+      "Bash(mono --version)",
+      "Bash(find /home/dh/Downloads/LibRincewind-main -maxdepth 3 -type d | head -50)"
     ]
   }
 }

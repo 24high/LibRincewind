@@ -1,0 +1,42 @@
+<Project>
+
+  <!--
+    Shared settings for every project in the solution.
+
+    The projects used to be legacy (non-SDK) csproj files with packages.config and a
+    checked-out ..\packages folder that is not in the tree. That combination only builds
+    inside Visual Studio on Windows and could not be built here at all. They are now
+    SDK-style, which restores NuGet packages on demand and builds with plain
+    `dotnet build` on any OS while still opening in Visual Studio.
+
+    The original files are kept next to each project as *.csproj.vs2022-legacy.bak.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+
+    <!-- The sources are laid out by hand and each project lists its files explicitly,
+         exactly as the legacy projects did. Globbing would also pick up the obj/ and
+         bin/ leftovers of the old builds. -->
+    <EnableDefaultItems>false</EnableDefaultItems>
+
+    <!-- Every project ships its own AssemblyInfo.cs. -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <!-- bin\Debug\ rather than bin\Debug\net472\, so the output layout matches the
+         legacy build and the plugin DLLs land next to the .exe that loads them by path. -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- .NET Framework 4.7.2 reference assemblies as a NuGet package: this is what lets
+         the build run without a Windows targeting pack installed. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

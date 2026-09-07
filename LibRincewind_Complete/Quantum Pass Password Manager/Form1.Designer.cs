@@ -28,6 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chkShowPassword = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -133,6 +136,7 @@
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.chkShowPassword);
             this.panel1.Controls.Add(this.button4);
             this.panel1.Controls.Add(this.button3);
             this.panel1.Controls.Add(this.button2);
@@ -163,6 +167,7 @@
             this.button4.TabIndex = 11;
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
+            this.toolTip1.SetToolTip(this.button4, "Copy the password to the clipboard (cleared after 7 s)");
             // 
             // button3
             // 
@@ -186,17 +191,17 @@
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(24, 207);
+            this.textBox3.Location = new System.Drawing.Point(24, 237);
             this.textBox3.Multiline = true;
             this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(688, 652);
+            this.textBox3.Size = new System.Drawing.Size(688, 622);
             this.textBox3.TabIndex = 8;
             this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(14, 179);
+            this.label7.Location = new System.Drawing.Point(14, 209);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(78, 25);
             this.label7.TabIndex = 7;
@@ -212,6 +217,8 @@
             this.button1.Size = new System.Drawing.Size(32, 32);
             this.button1.TabIndex = 6;
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.toolTip1.SetToolTip(this.button1, "Generate a random password");
             // 
             // txtPassword
             // 
@@ -219,7 +226,20 @@
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(453, 31);
             this.txtPassword.TabIndex = 5;
+            this.txtPassword.UseSystemPasswordChar = true;
             this.txtPassword.Enter += new System.EventHandler(this.txtPassword_Enter);
+            // 
+            // chkShowPassword
+            // 
+            this.chkShowPassword.AutoSize = true;
+            this.chkShowPassword.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.chkShowPassword.Location = new System.Drawing.Point(180, 152);
+            this.chkShowPassword.Name = "chkShowPassword";
+            this.chkShowPassword.Size = new System.Drawing.Size(180, 29);
+            this.chkShowPassword.TabIndex = 12;
+            this.chkShowPassword.Text = "Show password";
+            this.chkShowPassword.UseVisualStyleBackColor = true;
+            this.chkShowPassword.CheckedChanged += new System.EventHandler(this.chkShowPassword_CheckedChanged);
             // 
             // textBox2
             // 
@@ -504,6 +524,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.MaskedTextBox txtPassword;
+        private System.Windows.Forms.CheckBox chkShowPassword;
+        private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox txtTitle;
         private System.Windows.Forms.Label label6;

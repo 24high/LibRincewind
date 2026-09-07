@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>LibRincewindHoney</AssemblyName>
+    <RootNamespace>LibRincewind_4._7._2</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="PasswordDte.cs" />
+    <Compile Include="HoneyVault.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- HoneyVault wraps the core cipher. PasswordDte itself is standalone. -->
+    <ProjectReference Include="..\LibRincewind_4.7.2\LibRincewind_4.7.2\LibRincewind_4.7.2.csproj" />
+  </ItemGroup>
+
+</Project>

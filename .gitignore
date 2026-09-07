@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# VS2022 legacy csproj migration backups
+*.vs2022-legacy.bak

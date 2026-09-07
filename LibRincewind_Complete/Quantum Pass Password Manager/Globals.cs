@@ -15,25 +15,108 @@ namespace Quantum_Pass_Password_Manager
     public static class Globals
     {
 
-        public static SecureString _MasterPass=new SecureString();
-        public static unsafe String MasterPass
+        // Private: nothing outside this class has any business reading the raw store, and it
+        // used to be public static, reachable from every line of code in the process.
+        private static readonly SecureString _MasterPass = new SecureString();
+
+        /// <summary>Zeroes the stored master password. Called when the vault closes.</summary>
+        public static void ClearMasterPass()
         {
-            get
+            _MasterPass.Clear();
+        }
+
+        /// <summary>
+        /// Stores the master password.
+        ///
+        /// The incoming string cannot be wiped, and there is no way around that with a plain
+        /// WinForms TextBox: its text is a String before we ever see it. This is now the only
+        /// unerasable copy, made once at the prompt — it used to be joined by three more on
+        /// every single encrypt and decrypt.
+        /// </summary>
+        public static void SetMasterPassword(string value)
+        {
+            _MasterPass.Clear();
+            if (value == null) return;
+
+            foreach (char c in value)
+                _MasterPass.AppendChar(c);
+        }
+
+        /// <summary>
+        /// Hands the master password to <paramref name="use"/> as two wipeable character
+        /// arrays — the two halves CRincewind expects — and zeroes them again afterwards.
+        ///
+        /// This replaces a String-returning property. .NET strings are immutable, the GC does
+        /// not zero what it collects, and a compaction may move a string and leave the old
+        /// copy behind, so a String password is unerasable by construction. On this path the
+        /// password exists only as char[] and as the BSTR, both of which are zeroed in a
+        /// finally block, so nothing survives the call.
+        /// </summary>
+        public static T UseMasterPassword<T>(Func<char[], char[], T> use)
+        {
+            if (use == null) throw new ArgumentNullException("use");
+
+            char[] all = ToCharArray(_MasterPass);
+            char[] half1 = null, half2 = null;
+            try
             {
-                return new String(((char*)Marshal.SecureStringToBSTR(_MasterPass)));
+                int split = all.Length / 2;
+                half1 = new char[split];
+                half2 = new char[all.Length - split];
+                Array.Copy(all, 0, half1, 0, half1.Length);
+                Array.Copy(all, split, half2, 0, half2.Length);
+
+                return use(half1, half2);
             }
-            set
+            finally
             {
-                _MasterPass.Clear();
-                foreach (char c in value)
-                {
-                    _MasterPass.AppendChar(c);
-                }
+                Wipe(all);
+                Wipe(half1);
+                Wipe(half2);
             }
         }
 
+        /// <summary>
+        /// Reads a SecureString into a char[] without going through Marshal.PtrToStringBSTR,
+        /// which would allocate exactly the String this whole exercise is avoiding.
+        /// </summary>
+        private static char[] ToCharArray(SecureString s)
+        {
+            IntPtr bstr = Marshal.SecureStringToBSTR(s);
+            try
+            {
+                char[] chars = new char[s.Length];
+                for (int i = 0; i < chars.Length; i++)
+                    chars[i] = (char)Marshal.ReadInt16(bstr, i * 2);
+                return chars;
+            }
+            finally
+            {
+                Marshal.ZeroFreeBSTR(bstr);
+            }
+        }
+
+        private static void Wipe(char[] c)
+        {
+            if (c != null) Array.Clear(c, 0, c.Length);
+        }
+
+
+        /// <summary>
+        /// InputBox with the entry masked. Used for the master password, which must not be
+        /// readable over the user's shoulder.
+        /// </summary>
+        public static DialogResult PasswordBox(string title, string promptText, ref string value)
+        {
+            return InputBox(title, promptText, ref value, true);
+        }
 
         public static DialogResult InputBox(string title, string promptText, ref string value)
+        {
+            return InputBox(title, promptText, ref value, false);
+        }
+
+        private static DialogResult InputBox(string title, string promptText, ref string value, bool masked)
         {
             Form form = new Form();
             Label label = new Label();
@@ -44,6 +127,7 @@ namespace Quantum_Pass_Password_Manager
             form.Text = title;
             label.Text = promptText;
             textBox.Text = value;
+            textBox.UseSystemPasswordChar = masked;
 
             buttonOk.Text = "OK";
             buttonCancel.Text = "Cancel";

@@ -7,9 +7,12 @@
 using LibRincewind_4._7._2;
 using System;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 
@@ -41,7 +44,6 @@ namespace LibRincewindDemo_4._7._2
         private GroupBox groupBox3;
         private Label label9;
         private CheckBox checkBox1;
-        bool useRC4 = false;
         String SRng = "";
         String SEnc = "";
         private Label lblRotationsDec;
@@ -49,59 +51,138 @@ namespace LibRincewindDemo_4._7._2
         private Label label7;
         private Label label10;
         private Label label11;
-        int IVSize = 8;
+
+        /// <summary>IV length handed to CRincewind. Must match what the selected plugin expects.</summary>
+        int IVSize = 16;
+
     public Form1()
     {
         this.InitializeComponent();
-        IVSize = 16;
-        SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll";
-        this.libRincewind = new CRincewind(SEnc, SRng, 64);
+
+        // radioButton2 (RC4Plus) is the checked one in the designer, so start there.
+        // Selecting it here rather than duplicating the wiring keeps the two in step;
+        // the old code built the cipher with an IV size of 64 that no radio button
+        // ever produced again.
+        SelectRC4Plus();
     }
 
     private void Form1_Load(object sender, EventArgs e)
     {
     }
-        byte[] salt = null;
-        byte[] salt1 = null;
-        String ccryptData = "";
+
+        private static string PluginPath(string fileName)
+        {
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        }
+
+        private void RebuildCipher()
+        {
+            this.libRincewind = new CRincewind(SEnc, SRng, IVSize);
+        }
+
+        private void SelectRC4Plus()
+        {
+            IVSize = 16;                       // RC4Plus stretches the IV as a PBKDF2 salt
+            SEnc = PluginPath("LibRincewindPlugin_RC4Plus_4.7.2.dll");
+            RebuildCipher();
+        }
+
+        private void SelectChaCha20()
+        {
+            IVSize = 96 / 8;                   // ChaCha20 nonces are exactly 96 bits
+            SEnc = PluginPath("LibRincewindPlugin_ChaCha20_4.7.2.dll");
+            RebuildCipher();
+        }
+
+        /// <summary>
+        /// Renders a keystream as "mean // d0;d1;...". For a correct build the mean sits
+        /// near 47, the midpoint of the 95-character alphabet — a visibly skewed mean would
+        /// mean the digit stream is biased and the ciphertext leaks plaintext structure.
+        /// </summary>
+        private static string FormatKeystream(int[] digits)
+        {
+            if (digits == null || digits.Length == 0) return "";
+
+            double sum = 0;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < digits.Length; i++)
+            {
+                sum += digits[i];
+                if (i > 0) sb.Append(';');
+                sb.Append(digits[i].ToString(CultureInfo.InvariantCulture));
+            }
+            return (sum / digits.Length).ToString("F1", CultureInfo.InvariantCulture) + " // " + sb;
+        }
+
+        /// <summary>Pulls the Argon2id cost out of an RW6 envelope for display.</summary>
+        private static string KdfParamsOf(string envelope)
+        {
+            string[] parts = envelope.Split('.');
+            return parts.Length == 6 ? parts[4] : "";
+        }
+
+        private void ShowCipherError(string caption, Exception ex)
+        {
+            MessageBox.Show(this, ex.Message, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
         private void button1_Click(object sender, EventArgs e)
     {
-            salt = CRincewind.QRNG(256);
+            string plaintext = this.textBox3.Text;
 
-            salt1 = CRincewind.QRNG(256);
-            //ccryptData = this.libRincewind.encryptCCD(this.textBox3.Text, this.textBox1.Text, this.textBox2.Text,salt,salt1);
-            ccryptData = this.libRincewind.encryptString(textBox3.Text, "", textBox2.Text);
-      this.textBox4.Text = ccryptData;
-            lblRotationsEnc.Text = "";
-            int gesRotation = 0;
-            foreach (int rotation in CRincewind.rotations)
+            // The cipher is a bijection on printable ASCII and nothing else. Ask before
+            // encrypting rather than letting the library throw into an unhandled dialog.
+            if (!CRincewind.IsSupported(plaintext))
             {
-                gesRotation += rotation;
-                lblRotationsEnc.Text += rotation.ToString() + ";";
+                MessageBox.Show(this,
+                    "LibRincewind encrypts printable ASCII (U+0020..U+007E) only.\r\n\r\n" +
+                    "Encoding anything else would add redundancy to the ciphertext, and " +
+                    "redundancy is exactly the key check this cipher exists to remove.",
+                    "Unsupported characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            gesRotation = gesRotation / CRincewind.rotations.Count();
-            lblRotationsEnc.Text = gesRotation.ToString() + "//" + lblRotationsEnc.Text;
+
+            try
+            {
+                // Salts and IV live inside the envelope; the library draws fresh ones per
+                // message. The old code generated 256-byte salts here and threw them away.
+                this.textBox4.Text = this.libRincewind.encryptString(plaintext, "", this.textBox2.Text);
+            }
+            catch (Exception ex)
+            {
+                ShowCipherError("Encryption failed", ex);
+                return;
+            }
+
+            this.textBox5.Text = KdfParamsOf(this.textBox4.Text);
+            lblRotationsEnc.Text = FormatKeystream(CRincewind.rotations);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            CRincewind libRincewind = this.libRincewind;
-            CCryptData cryptData = new CCryptData();
-            cryptData.CryptedData = this.textBox4.Text;
-            cryptData.Key = this.textBox5.Text;
-            cryptData.IV = this.libRincewind.IV;
-
-            string text2 = this.textBox2.Text;
-            this.textBox6.Text = libRincewind.decryptString(ccryptData, "", text2);
-            lblRotationsDec.Text = "";
-            float gesRotations = 0;
-            foreach (int rotation in CRincewind.rotationsDec)
+            // Decrypt what is on screen, so the envelope can be edited by hand to watch a
+            // tampered ciphertext decrypt to garbage without complaint.
+            string envelope = this.textBox4.Text;
+            if (string.IsNullOrEmpty(envelope))
             {
-                gesRotations += (float) rotation;
-                lblRotationsDec.Text += rotation.ToString() + ";";
+                MessageBox.Show(this, "Encrypt something first.", "Nothing to decrypt",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-            gesRotations = gesRotations / CRincewind.rotationsDec.Count(); ;
-            lblRotationsDec.Text = gesRotations.ToString() + "//" + lblRotationsDec.Text;
+
+            try
+            {
+                // A wrong password does not throw here: it returns a plausible printable
+                // string of the right length. That is the whole point of the construction.
+                this.textBox6.Text = this.libRincewind.decryptString(envelope, "", this.textBox2.Text);
+            }
+            catch (Exception ex)
+            {
+                ShowCipherError("Decryption failed", ex);
+                return;
+            }
+
+            lblRotationsDec.Text = FormatKeystream(CRincewind.rotationsDec);
         }
 
     protected override void Dispose(bool disposing)
@@ -190,7 +271,7 @@ namespace LibRincewindDemo_4._7._2
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(163, 25);
             this.label5.TabIndex = 5;
-            this.label5.Text = "Encryption Key:";
+            this.label5.Text = "KDF parameters:";
             // 
             // label6
             // 
@@ -237,6 +318,7 @@ namespace LibRincewindDemo_4._7._2
             // 
             this.textBox5.Location = new System.Drawing.Point(199, 244);
             this.textBox5.Name = "textBox5";
+            this.textBox5.ReadOnly = true;
             this.textBox5.Size = new System.Drawing.Size(400, 31);
             this.textBox5.TabIndex = 12;
             // 
@@ -312,7 +394,7 @@ namespace LibRincewindDemo_4._7._2
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(181, 25);
             this.label8.TabIndex = 19;
-            this.label8.Text = "With Librincewind";
+            this.label8.Text = "Last candidate";
             // 
             // textBox8
             // 
@@ -359,7 +441,7 @@ namespace LibRincewindDemo_4._7._2
             this.groupBox3.Size = new System.Drawing.Size(599, 365);
             this.groupBox3.TabIndex = 23;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Test failures";
+            this.groupBox3.Text = "Brute force: wrong passwords that look wrong";
             this.groupBox3.Enter += new System.EventHandler(this.groupBox3_Enter);
             // 
             // label10
@@ -369,7 +451,7 @@ namespace LibRincewindDemo_4._7._2
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(144, 25);
             this.label10.TabIndex = 27;
-            this.label10.Text = "Rotations dec";
+            this.label10.Text = "Keystream (dec)";
             // 
             // label11
             // 
@@ -378,7 +460,7 @@ namespace LibRincewindDemo_4._7._2
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(144, 25);
             this.label11.TabIndex = 26;
-            this.label11.Text = "Rotations enc";
+            this.label11.Text = "Keystream (enc)";
             // 
             // lblRotationsDec
             // 
@@ -387,7 +469,7 @@ namespace LibRincewindDemo_4._7._2
             this.lblRotationsDec.Name = "lblRotationsDec";
             this.lblRotationsDec.Size = new System.Drawing.Size(144, 25);
             this.lblRotationsDec.TabIndex = 25;
-            this.lblRotationsDec.Text = "Rotations dec";
+            this.lblRotationsDec.Text = "";
             this.lblRotationsDec.Click += new System.EventHandler(this.lblRotationsDec_Click);
             // 
             // lblRotationsEnc
@@ -397,7 +479,7 @@ namespace LibRincewindDemo_4._7._2
             this.lblRotationsEnc.Name = "lblRotationsEnc";
             this.lblRotationsEnc.Size = new System.Drawing.Size(144, 25);
             this.lblRotationsEnc.TabIndex = 24;
-            this.lblRotationsEnc.Text = "Rotations enc";
+            this.lblRotationsEnc.Text = "";
             // 
             // label7
             // 
@@ -406,7 +488,7 @@ namespace LibRincewindDemo_4._7._2
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(102, 25);
             this.label7.TabIndex = 23;
-            this.label7.Text = "Error rate";
+            this.label7.Text = "Outside alphabet";
             // 
             // label9
             // 
@@ -444,12 +526,7 @@ namespace LibRincewindDemo_4._7._2
         private void radioButton2_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButton2.Checked)
-            {
-                IVSize = 64;
-                SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_RC4Plus_4.7.2.dll";
-                this.libRincewind = new CRincewind(SEnc, SRng, 16);
-                
-            }
+                SelectRC4Plus();
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -460,74 +537,103 @@ namespace LibRincewindDemo_4._7._2
         private void radioButton4_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButton4.Checked)
-            {
-                IVSize = 96 / 8;
-                SEnc = AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindPlugin_ChaCha20_4.7.2.dll";
-                this.libRincewind = new CRincewind(SEnc, SRng, 96 / 8);
-            }
+                SelectChaCha20();
         }
 
         private void groupBox3_Enter(object sender, EventArgs e)
         {
 
         }
-        bool running = true;
+        private volatile bool running = false;
 
-        public byte[] generateIV(int length)
-        {
-            return CRincewind.QRNG(length);
-        }
+        /// <summary>
+        /// Brute-force panel: decrypt the current envelope under a stream of random wrong
+        /// passwords and count how many of the results fall outside the printable alphabet.
+        ///
+        /// The counter is supposed to stay at 0/n forever. Every wrong password must yield a
+        /// string that looks exactly as plausible as the right one, because there is no
+        /// checksum, no MAC and no padding for an attacker to test against. A single hit
+        /// would mean the ciphertext leaks a way to recognise the correct key.
+        ///
+        /// The rate you see is also the honest cost of a guess: one Argon2id pass over
+        /// 64 MiB per candidate. There is no artificial delay in this loop.
+        /// </summary>
         private void button3_Click(object sender, EventArgs e)
         {
             if (running)
             {
+                running = false;                 // the worker stops at the top of its next pass
                 button3.Text = "Test";
-                running = false;
+                return;
             }
-            else
+
+            string envelope = this.textBox4.Text;
+            if (string.IsNullOrEmpty(envelope))
             {
-                button3.Text = "Stop";
-                new System.Threading.Thread(() =>
-                {
-                    long tries = 0;
-                    long errors = 0;
-                    running = true;
-                    while (running)
-                    {
-                        String pass1 = RandomString(10);
-                        String pass2 = RandomString(10);
-
-                        CRincewind libRincewind = this.libRincewind;
-                    
-                        String LRDec = libRincewind.decryptString(ccryptData, pass1, pass2);
-                        this.textBox8.Invoke(new Action(() =>
-                        {
-                            tries++;
-                            for (int i = 0; i < LRDec.Length; i++)
-                                if (LRDec[i] < 36 || LRDec[i] > 126)
-                                {
-                                    errors++;
-                                    break;
-                                }
-                            this.label9.Text=errors.ToString()+"/"+tries.ToString();
-                            this.textBox8.Text = LRDec;
-                            lblRotationsDec.Text = "";
-                            float gesRotations = 0;
-                            foreach (int rotation in CRincewind.rotationsDec)
-                            {
-                                gesRotations += (float)rotation;
-                                lblRotationsDec.Text += rotation.ToString() + ";";
-                            }
-                            gesRotations = gesRotations / CRincewind.rotationsDec.Count();
-                            lblRotationsDec.Text = gesRotations.ToString() + "//" + lblRotationsDec.Text;
-                        }));
-              
-
-                        System.Threading.Thread.Sleep(500);
-                    }
-                    ;
-                }).Start();
+                MessageBox.Show(this, "Encrypt something first, then run the test against it.",
+                                "Nothing to attack", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
+
+            running = true;
+            button3.Text = "Stop";
+
+            Thread worker = new Thread(() => BruteForceLoop(envelope));
+            worker.IsBackground = true;          // must not keep the process alive on close
+            worker.Start();
+        }
+
+        private void BruteForceLoop(string envelope)
+        {
+            long tries = 0;
+            long outsideAlphabet = 0;
+
+            while (running)
+            {
+                string candidate;
+                try
+                {
+                    candidate = this.libRincewind.decryptString(envelope, "", RandomString(10));
+                }
+                catch (Exception)
+                {
+                    break;                       // e.g. the plugin was swapped mid-run
+                }
+
+                tries++;
+                if (!CRincewind.IsSupported(candidate))
+                    outsideAlphabet++;
+
+                int[] keystream = CRincewind.rotationsDec;
+                long shownTries = tries, shownOutside = outsideAlphabet;
+                try
+                {
+                    this.textBox8.Invoke(new Action(() =>
+                    {
+                        this.label9.Text = shownOutside.ToString(CultureInfo.InvariantCulture) + "/" +
+                                           shownTries.ToString(CultureInfo.InvariantCulture);
+                        this.textBox8.Text = candidate;
+                        lblRotationsDec.Text = FormatKeystream(keystream);
+                    }));
+                }
+                catch (Exception)
+                {
+                    break;                       // the form went away underneath us
+                }
+            }
+
+            running = false;
+            try
+            {
+                button3.Invoke(new Action(() => button3.Text = "Test"));
+            }
+            catch (Exception) { }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            running = false;
+            base.OnFormClosing(e);
         }
 
         private static Random random = new Random();
@@ -538,18 +644,25 @@ namespace LibRincewindDemo_4._7._2
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
-        public static bool QRNG = false;
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox1.Checked)
+            // CRincewind.Rng is static, so the constructor below switches the entropy source
+            // process-wide. Unchecking goes back to the OS CSPRNG.
+            SRng = checkBox1.Checked ? PluginPath("LibRincewindRNG_QRNG-API.dll") : "";
+
+            try
             {
-                SRng=AppDomain.CurrentDomain.BaseDirectory + "\\LibRincewindRNG_QRNG-API.dll";
+                RebuildCipher();
             }
-            else
+            catch (Exception ex)
             {
+                // The quantum RNG is a network service. If it cannot be loaded, say so and
+                // fall back visibly rather than quietly encrypting with something else.
                 SRng = "";
+                RebuildCipher();
+                checkBox1.Checked = false;
+                ShowCipherError("Quantum RNG unavailable — using the OS CSPRNG", ex);
             }
-            this.libRincewind = new CRincewind(SEnc, SRng, IVSize);
         }
 
         private void lblRotationsDec_Click(object sender, EventArgs e)
